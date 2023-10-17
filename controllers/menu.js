@@ -4,10 +4,10 @@ const { Menu } = require("../models/menu");
 const getAllMenu = async (req, res) => {
   // Configura la connessione al tuo database
   const connection = mysql.createConnection({
-    host: "prolocbadmin.mysql.db",
-    user: "prolocbadmin",
-    password: "aStFWRYN3qWGsHD",
-    database: "prolocbadmin",
+    host: process.env.HOST_PROLOCO,
+    user: process.env.USER_PROLOCO,
+    password: process.env.PASSWORD_PROLOCO,
+    database: process.env.DATABASE_PROLOCO,
   });
 
   try {
