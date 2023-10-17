@@ -5,10 +5,10 @@ const getAllMenu = async (req, res) => {
   try {
     // Configura la connessione al tuo database
     const connection = await mysql.createConnection({
-      host: process.env.HOST_PROLOCO,
-      user: process.env.USER_PROLOCO,
-      password: process.env.PASSWORD_PROLOCO,
-      database: process.env.DATABASE_PROLOCO,
+      host: process.env.HOST_FABIO,
+      user: process.env.USER_FABIO,
+      password: "",
+      database: process.env.DATABASE_FABIO,
     });
 
     // Esegui una query di selezione
