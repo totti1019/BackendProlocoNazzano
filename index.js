@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "https://fabiocola.altervista.org/"
+    "https://fabiocola.altervista.org"
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
