@@ -1,45 +1,54 @@
-const mysql = require("mysql2/promise");
+const { initializeApp } = require("firebase/app");
+
+const { getDatabase, ref, get, set, remove } = require("firebase/database");
+
 const { Menu } = require("../models/menu");
 
+require("dotenv").config();
+
+// Configura Firebase con le credenziali del tuo progetto
+const firebaseConfig = {
+  apiKey: process.env.APIKEY_FIREBASE,
+  authDomain: process.env.AUTHDOMAIN_FIREBASE,
+  databaseURL: process.env.DATABASEURL_FIREBASE,
+  projectId: process.env.PROJECTID_FIREBASE,
+  storageBucket: process.env.STORAGEBUCKET_FIREBASE,
+  messagingSenderId: process.env.MESSAGGINGSENDERID_FIREBASE,
+  appId: process.env.APPID_FIREBASE,
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+const percorsoDb = "prolocoNazzano/polenta2023/";
+
 const getAllMenu = async (req, res) => {
-  let connection = null; // Inizializza la variabile connection a null
   try {
-    // Configura la connessione al tuo database su Altervista
-    connection = await mysql.createConnection({
-      host: process.env.HOST_PROLOCO,
-      user: process.env.USER_PROLOCO,
-      password: process.env.PASSWORD_PROLOCO,
-      database: process.env.DATABASE_PROLOCO,
-    });
+    const dataRef = ref(database, percorsoDb + "menu");
 
-    // Esegui una query di selezione
-    const [results, fields] = await connection.execute(
-      `SELECT * FROM ${process.env.TABLE_NAME_MENU}`
-    );
-
-    // Chiudi la connessione al database quando hai finito
-    await connection.end();
-
-    console.log("Risultati della query:", results);
-
-    res.status(200).json(results);
+    await get(dataRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          res.status(200).json(data);
+        } else {
+          res.status(500).json({
+            code: res.statusCode,
+            message: "Errore nella lettura dei dati: " + error.message,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Errore nella lettura dei dati: " + error);
+        callback(null); // Gestisci l'errore
+      });
   } catch (error) {
-    console.error("Errore durante l'esecuzione della query:", error);
+    console.error("Errore nella lettura dei dati: ", error);
 
     res.status(500).json({
       code: res.statusCode,
-      message: "Errore durante l'esecuzione della query",
-      error: error.message, // Includi i dettagli dell'errore nella risposta
+      message: "Errore nella lettura dei dati: " + error.message,
     });
-  } finally {
-    // Gestisci la chiusura della connessione in caso di errore
-    if (connection) {
-      try {
-        await connection.end();
-      } catch (err) {
-        console.error("Errore durante la chiusura della connessione:", err);
-      }
-    }
   }
 };
 
