@@ -20,38 +20,137 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-const percorsoDb = "prolocoNazzano/polenta2023/";
+const percorsoDb = "prolocoNazzano/polenta2023/menu";
 
 const getAllMenu = async (req, res) => {
   try {
-    const dataRef = ref(database, percorsoDb + "menu");
+    const dataRef = ref(database, percorsoDb);
 
     await get(dataRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          res.status(200).json(data);
+          res.status(200).json({
+            code: res.statusCode,
+            esito: true,
+            message: data,
+          });
         } else {
           res.status(500).json({
             code: res.statusCode,
+            esito: false,
             message: "Errore nella lettura dei dati: " + error.message,
           });
         }
       })
       .catch((error) => {
         console.error("Errore nella lettura dei dati: " + error);
-        callback(null); // Gestisci l'errore
+        res.status(500).json({
+          code: res.statusCode,
+          esito: false,
+          message: "Errore nella lettura dei dati: " + error.message,
+        });
       });
   } catch (error) {
     console.error("Errore nella lettura dei dati: ", error);
 
     res.status(500).json({
       code: res.statusCode,
+      esito: false,
       message: "Errore nella lettura dei dati: " + error.message,
     });
   }
 };
 
+// Funzione per scrivere dati nel database Firebase
+const saveMenu = async (req, res) => {
+  const jsonString = req.body;
+  try {
+    // Controllo che il json sia valido
+    if (isValidJSON(jsonString)) {
+      const dataRef = ref(database, percorsoDb);
+      // Utilizza il metodo 'set' per sovrascrivere i dati nel percorso specificato
+      set(dataRef, jsonString)
+        .then(() => {
+          res.status(200).json({
+            code: res.statusCode,
+            esito: true,
+            message: "Menu salvato correttamente",
+          });
+        })
+        .catch((error) => {
+          console.error("Errore nella scrittura dei dati: " + error);
+          res.status(500).json({
+            code: res.statusCode,
+            esito: false,
+            message: "Errore nella scrittura dei dati: " + error,
+          });
+        });
+    } else {
+      console.log("JSON non valido");
+      res.status(500).json({
+        code: res.statusCode,
+        esito: false,
+        message: "Errore nella scrittura dei dati: json non valido",
+      });
+    }
+  } catch (error) {
+    console.error("Errore nella lettura dei dati: ", error);
+    res.status(500).json({
+      code: res.statusCode,
+      esito: false,
+      message: "Errore nella scrittura dei dati: " + error,
+    });
+  }
+};
+
+// Elimino tutta la tabella del menu
+const deleteMenu = async (req, res) => {
+  const dataRef = ref(database, percorsoDb);
+  try {
+    // Utilizza il metodo 'remove' per eliminare il nodo specificato
+    remove(dataRef)
+      .then(() => {
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          message: "Menu eliminato correttamente",
+        });
+      })
+      .catch((error) => {
+        console.error("Errore nell'eliminazione del nodo: " + error);
+        res.status(500).json({
+          code: res.statusCode,
+          esito: false,
+          message: "Errore nell'eliminazione del nodo: " + error,
+        });
+      });
+  } catch (error) {
+    console.error("Errore nell'eliminazione del nodo: ", error);
+    res.status(500).json({
+      code: res.statusCode,
+      esito: false,
+      message: "Errore nell'eliminazione del nodo: " + error,
+    });
+  }
+};
+
+function isValidJSON(text) {
+  try {
+    if (Array.isArray(text)) {
+      return true; // È un array
+    }
+    if (typeof text === "object" && text !== null) {
+      return true; // È un oggetto
+    }
+  } catch (error) {
+    //console.log(error);
+    return false;
+  }
+}
+
 module.exports = {
   getAllMenu,
+  saveMenu,
+  deleteMenu,
 };
