@@ -40,7 +40,7 @@ const configureWebSocket = (io) => {
       for (const socket of activeSockets) {
         socket.emit(
           "firebase-update",
-          json({
+          JSON.stringify({
             code: 200,
             esito: true,
             response: data,
@@ -51,7 +51,7 @@ const configureWebSocket = (io) => {
       for (const socket of activeSockets) {
         socket.emit(
           "firebase-update",
-          json({
+          JSON.stringify({
             code: 404,
             esito: false,
             message: "I dati non esistono.",
