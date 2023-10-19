@@ -20,9 +20,10 @@ const app = express();
 const configureWebSocket = require("./middlewares/websocket");
 
 dotenv.config();
+
 const PORT = process.env.PORT || 3000;
 
-const httpServer = createServer();
+const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
