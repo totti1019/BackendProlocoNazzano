@@ -18,18 +18,30 @@ const database = getDatabase(app);
 const percorsoDb = "prolocoNazzano/polenta2023/numeratore";
 
 const configureWebSocket = (io) => {
+  const activeSockets = new Set(); // Utilizziamo un set per tenere traccia dei socket attivi
+
   io.on("connection", (socket) => {
     console.log("Nuova connessione WebSocket:", socket.id);
 
-    const dataRef = ref(database, percorsoDb);
+    activeSockets.add(socket); // Aggiungiamo il socket alla lista degli attivi
 
-    onValue(dataRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        console.log("ECCOMI " + data);
-        io.emit("firebase-update", data);
-      }
+    socket.on("disconnect", () => {
+      console.log("Socket disconnesso:", socket.id);
+      activeSockets.delete(socket); // Rimuoviamo il socket disconnesso
     });
+  });
+
+  const dataRef = ref(database, percorsoDb);
+
+  onValue(dataRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+
+      // Inviamo l'aggiornamento solo ai socket attivi per evitare duplicati
+      for (const socket of activeSockets) {
+        socket.emit("firebase-update", data);
+      }
+    }
   });
 };
 
