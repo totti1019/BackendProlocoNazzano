@@ -80,11 +80,11 @@ const saveMenu = async (req, res) => {
           });
         })
         .catch((error) => {
-          console.error("Errore nella scrittura dei dati: " + error);
+          console.error("Menu non salvato: " + error);
           res.status(500).json({
             code: res.statusCode,
             esito: false,
-            message: "Errore nella scrittura dei dati",
+            message: "Menu non salvato",
           });
         });
     } else {
@@ -92,15 +92,15 @@ const saveMenu = async (req, res) => {
       res.status(500).json({
         code: res.statusCode,
         esito: false,
-        message: "Errore nella scrittura dei dati: json non valido",
+        message: "Menu non salvato: JSON non valido",
       });
     }
   } catch (error) {
-    console.error("Errore nella scrittura dei dati: ", error);
+    console.error("Menu non salvato: ", error);
     res.status(500).json({
       code: res.statusCode,
       esito: false,
-      message: "Errore nella scrittura dei dati",
+      message: "Menu non salvato",
     });
   }
 };
@@ -119,19 +119,19 @@ const deleteMenu = async (req, res) => {
         });
       })
       .catch((error) => {
-        console.error("Errore nell'eliminazione del nodo: " + error);
+        console.error("Menu non eliminato: " + error);
         res.status(500).json({
           code: res.statusCode,
           esito: false,
-          message: "Errore nell'eliminazione del nodo",
+          message: "Menu non eliminato",
         });
       });
   } catch (error) {
-    console.error("Errore nell'eliminazione del nodo: ", error);
+    console.error("Menu non eliminato: ", error);
     res.status(500).json({
       code: res.statusCode,
       esito: false,
-      message: "Errore nell'eliminazione del nodo",
+      message: "Menu non eliminato",
     });
   }
 };
