@@ -26,7 +26,8 @@ const httpServer = createServer();
 
 const io = new Server(httpServer, {
   cors: {
-    origin: false,
+    origin: "https://fabiocola.altervista.org", // L'origine consentita
+    methods: ["GET", "POST"], // Metodi consentiti
   },
 });
 
