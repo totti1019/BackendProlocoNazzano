@@ -39,7 +39,7 @@ const getAllMenu = async (req, res) => {
           console.error("I dati non esistono. Inserire il menu.");
           res.status(404).json({
             code: res.statusCode,
-            esito: true,
+            esito: false,
             message: "I dati non esistono. Inserire il menu.",
           });
         }
