@@ -33,24 +33,6 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("Nuova connessione WebSocket:", socket.id);
-  socket.on("message", (data) => {
-    console.log("Nuova connessione WebSocket: " + data);
-    io.emit("firebase-update", data);
-  });
-
-  //const dataRef = ref(database, percorsoDb);
-
-  /* onValue(dataRef, (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      console.log("ECCOMI " + data);
-      io.emit("firebase-update", data);
-    }
-  }); */
-});
-
 // Middleware per abilitare CORS
 app.use((req, res, next) => {
   res.setHeader(
@@ -86,7 +68,8 @@ app.get("/", (req, res) => {
 //const io = new Server(server);
 
 // Configura il server WebSocket
-//configureWebSocket(io); // Passa l'istanza di io al modulo di configurazione
+configureWebSocket(io); // Passa l'istanza di io al modulo di configurazione
+
 /*
 app.listen(PORT, () => {
   console.log(`server listening on ${PORT}`); // npm run dev
