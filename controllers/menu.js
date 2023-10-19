@@ -75,7 +75,7 @@ const saveMenu = async (req, res) => {
           res.status(200).json({
             code: res.statusCode,
             esito: true,
-            response: true,
+            response: "Menu salvato correttamente",
           });
         })
         .catch((error) => {
@@ -83,7 +83,7 @@ const saveMenu = async (req, res) => {
           res.status(500).json({
             code: res.statusCode,
             esito: false,
-            message: "Errore nella scrittura dei dati: " + error,
+            message: "Errore nella scrittura dei dati",
           });
         });
     } else {
@@ -99,7 +99,7 @@ const saveMenu = async (req, res) => {
     res.status(500).json({
       code: res.statusCode,
       esito: false,
-      message: "Errore nella scrittura dei dati: " + error,
+      message: "Errore nella scrittura dei dati",
     });
   }
 };
@@ -114,7 +114,7 @@ const deleteMenu = async (req, res) => {
         res.status(200).json({
           code: res.statusCode,
           esito: true,
-          response: true,
+          response: "Menu eliminato con successo",
         });
       })
       .catch((error) => {
@@ -122,7 +122,7 @@ const deleteMenu = async (req, res) => {
         res.status(500).json({
           code: res.statusCode,
           esito: false,
-          message: "Errore nell'eliminazione del nodo: " + error,
+          message: "Errore nell'eliminazione del nodo",
         });
       });
   } catch (error) {
@@ -130,7 +130,7 @@ const deleteMenu = async (req, res) => {
     res.status(500).json({
       code: res.statusCode,
       esito: false,
-      message: "Errore nell'eliminazione del nodo: " + error,
+      message: "Errore nell'eliminazione del nodo",
     });
   }
 };
