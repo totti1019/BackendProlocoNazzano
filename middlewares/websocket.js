@@ -36,10 +36,27 @@ const configureWebSocket = (io) => {
   onValue(dataRef, (snapshot) => {
     if (snapshot.exists()) {
       const data = snapshot.val();
-
       // Inviamo l'aggiornamento solo ai socket attivi per evitare duplicati
       for (const socket of activeSockets) {
-        socket.emit("firebase-update", data);
+        socket.emit(
+          "firebase-update",
+          json({
+            code: 200,
+            esito: true,
+            response: data,
+          })
+        );
+      }
+    } else {
+      for (const socket of activeSockets) {
+        socket.emit(
+          "firebase-update",
+          json({
+            code: 404,
+            esito: false,
+            message: "I dati non esistono.",
+          })
+        );
       }
     }
   });
