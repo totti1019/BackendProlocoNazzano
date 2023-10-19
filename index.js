@@ -1,5 +1,8 @@
 const express = require("express");
 
+const http = require("http");
+const { Server } = require("socket.io");
+
 const dotenv = require("dotenv");
 
 const usersRouters = require("./routers/users");
@@ -13,6 +16,9 @@ const menuRouters = require("./routers/menu");
 const numeratoreRouters = require("./routers/numeratore");
 
 const app = express();
+
+const configureWebSocket = require("./middlewares/websocket");
+
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 
@@ -46,6 +52,12 @@ app.use("/numeratore", numeratoreRouters);
 app.get("/", (req, res) => {
   res.send("Benvenuto nella homepage della Proloco Nazzano");
 });
+
+const server = http.createServer(app);
+const io = new Server(server);
+
+// Configura il server WebSocket
+configureWebSocket(io); // Passa l'istanza di io al modulo di configurazione
 
 app.listen(PORT, () => {
   console.log(`server listening on ${PORT}`); // npm run dev
