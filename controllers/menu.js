@@ -33,7 +33,7 @@ const getAllMenu = async (req, res) => {
           res.status(200).json({
             code: res.statusCode,
             esito: true,
-            message: data,
+            response: data,
           });
         } else {
           res.status(500).json({
@@ -75,7 +75,7 @@ const saveMenu = async (req, res) => {
           res.status(200).json({
             code: res.statusCode,
             esito: true,
-            message: "Menu salvato correttamente",
+            response: true,
           });
         })
         .catch((error) => {
@@ -95,7 +95,7 @@ const saveMenu = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Errore nella lettura dei dati: ", error);
+    console.error("Errore nella scrittura dei dati: ", error);
     res.status(500).json({
       code: res.statusCode,
       esito: false,
@@ -114,7 +114,7 @@ const deleteMenu = async (req, res) => {
         res.status(200).json({
           code: res.statusCode,
           esito: true,
-          message: "Menu eliminato correttamente",
+          response: true,
         });
       })
       .catch((error) => {
