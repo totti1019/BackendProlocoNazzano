@@ -10,6 +10,8 @@ const { authenticateToken } = require("./middlewares/auth");
 
 const menuRouters = require("./routers/menu");
 
+const numeratoreRouters = require("./routers/numeratore");
+
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +41,7 @@ app.use(express.json());
 app.use("/users", authenticateToken, usersRouters);
 app.use("/auth", authRoutes);
 app.use("/menu", menuRouters);
+app.use("/numeratore", numeratoreRouters);
 
 app.get("/", (req, res) => {
   res.send("Benvenuto nella homepage della Proloco Nazzano");
