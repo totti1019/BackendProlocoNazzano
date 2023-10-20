@@ -20,6 +20,7 @@ const database = getDatabase(app);
 
 const percorsoDb = "prolocoNazzano/polenta2023/numeratore";
 
+// Funzione per leggere dati nel database Firebase
 const getNumber = async (req, res) => {
   try {
     const dataRef = ref(database, percorsoDb);

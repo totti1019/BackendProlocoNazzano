@@ -1,39 +1,33 @@
+// Import delle librerie e moduli necessari
 const express = require("express");
-
-const { createServer } = require("http");
-
+const http = require("http");
 const { Server } = require("socket.io");
-
 const dotenv = require("dotenv");
-
 const usersRouters = require("./routers/users");
-
 const authRoutes = require("./routers/auth");
-
 const { authenticateToken } = require("./middlewares/auth");
-
 const menuRouters = require("./routers/menu");
-
 const numeratoreRouters = require("./routers/numeratore");
-
-const app = express();
-
 const configureWebSocket = require("./middlewares/websocket");
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-const httpServer = createServer(app);
+// Configura l'app Express
+const app = express();
 
+const httpServer = http.createServer(app);
+
+// Configurazione del WebSocket con Socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://fabiocola.altervista.org", // L'origine consentita
-    methods: ["GET", "POST"], // Metodi consentiti
+    origin: "https://fabiocola.altervista.org",
+    methods: ["GET", "POST"],
   },
 });
 
-// Middleware per abilitare CORS
+// Configurazione delle impostazioni CORS con Express
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
@@ -53,28 +47,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Impostazione del middleware per il parsing del corpo delle richieste come JSON
 app.use(express.json());
 
+// Collegamento delle rotte alle relative parti dell'app
 app.use("/users", authenticateToken, usersRouters);
 app.use("/auth", authRoutes);
 app.use("/menu", menuRouters);
 app.use("/numeratore", numeratoreRouters);
 
+// Rotta di benvenuto
 app.get("/", (req, res) => {
   res.send("Benvenuto nella homepage della Proloco Nazzano");
 });
 
-//const server = http.createServer(app);
-//const io = new Server(server);
+// Passa l'istanza di io al modulo di configurazione
+configureWebSocket(io);
 
-// Configura il server WebSocket
-configureWebSocket(io); // Passa l'istanza di io al modulo di configurazione
-
-/*
-app.listen(PORT, () => {
-  console.log(`server listening on ${PORT}`); // npm run dev
-}); */
-
+// Inizializza il server HTTP e WebSocket
 httpServer.listen(PORT, () => {
-  console.log(`server listening on ${PORT}`); // npm run dev
+  console.log(`Server listening on port ${PORT}`);
 });
