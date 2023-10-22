@@ -7,8 +7,6 @@ const {
   set,
   remove,
   update,
-  child,
-  push,
 } = require("firebase/database");
 
 require("dotenv").config();
@@ -29,51 +27,8 @@ const database = getDatabase(app);
 
 const percorsoDb = "prolocoNazzano/polenta2023/comande";
 
-const getNumeroComanda2 = async (req, res) => {
-  try {
-    const dataRef = ref(database, percorsoDb);
-
-    await get(dataRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: data,
-          });
-        } else {
-          console.error("I dati non esistono. Inserire il menu.");
-          res.status(404).json({
-            code: res.statusCode,
-            esito: false,
-            message: "I dati non esistono. Inserire il menu.",
-          });
-        }
-      })
-      .catch((error) => {
-        console.error("Errore nella lettura dei dati: " + error);
-        res.status(500).json({
-          code: res.statusCode,
-          esito: false,
-          message: "Errore nella lettura dei dati: " + error.message,
-        });
-      });
-  } catch (error) {
-    console.error("Errore nella lettura dei dati: ", error);
-
-    res.status(500).json({
-      code: res.statusCode,
-      esito: false,
-      message: "Errore nella lettura dei dati: " + error.message,
-    });
-  }
-};
-
 // Funzione per scrivere dati nel database Firebase
 const getNumeroComanda = async (req, res) => {
-  const jsonString = req.body;
-  //console.log(jsonString);
   const dataRef = ref(database, percorsoDb);
   try {
     await get(dataRef)
@@ -87,19 +42,19 @@ const getNumeroComanda = async (req, res) => {
         }
       })
       .catch((error) => {
-        console.error("Errore nella lettura dei dati: " + error);
+        console.error("Numero non letto: " + error);
         res.status(500).json({
           code: res.statusCode,
           esito: false,
-          message: "Errore nella lettura dei dati: " + error.message,
+          message: "Numero non letto: " + error.message,
         });
       });
   } catch (error) {
-    console.error("Menu non salvato: ", error);
+    console.error("Numero non letto: ", error);
     res.status(500).json({
       code: res.statusCode,
       esito: false,
-      message: "Menu non salvato",
+      message: "Numero non letto",
     });
   }
 };
@@ -109,60 +64,11 @@ const saveNumeroComanda = async (req, res, numeroComanda) => {
   try {
     // Controllo che il json sia valido
     if (numeroComanda) {
-      //percorsoDb += "/" + 2;
-      console.log(percorsoDb);
       const dataRef = ref(database, percorsoDb);
       // Utilizza il metodo 'set' per sovrascrivere i dati nel percorso specificato
       const oggetto = [{ numeroComanda: 1 }];
 
       set(dataRef, oggetto)
-        .then(() => {
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: "Numero salvato correttamente",
-          });
-        })
-        .catch((error) => {
-          console.error("Numero non salvato: " + error);
-          res.status(500).json({
-            code: res.statusCode,
-            esito: false,
-            message: "Numero non salvato",
-          });
-        });
-    } else {
-      console.log("JSON non valido");
-      res.status(500).json({
-        code: res.statusCode,
-        esito: false,
-        message: "Numero non salvato: JSON non valido",
-      });
-    }
-  } catch (error) {
-    console.error("Numero non salvato: ", error);
-    res.status(500).json({
-      code: res.statusCode,
-      esito: false,
-      message: "Numero non salvato",
-    });
-  }
-};
-
-// Funzione per scrivere dati nel database Firebase
-const updateNumeroComanda = async (req, res, numeroComanda) => {
-  try {
-    if (numeroComanda) {
-      console.log(percorsoDb);
-      const dataRef = ref(database, percorsoDb);
-
-      //const newPostKey = push(child(ref(database), "comanda")).requestNumber_;
-      //console.log("CHE newPostKey ", newPostKey);
-      const oggetto = { numeroComanda: numeroComanda.length + 1 };
-      const updates = {};
-      updates[numeroComanda.length] = oggetto;
-
-      update(dataRef, updates)
         .then(() => {
           res.status(200).json({
             code: res.statusCode,
@@ -196,14 +102,55 @@ const updateNumeroComanda = async (req, res, numeroComanda) => {
   }
 };
 
-// Funzione per scrivere dati nel database Firebase
+// Funzione per aggiornare dati nel database Firebase
+const updateNumeroComanda = async (req, res, numeroComanda) => {
+  try {
+    if (numeroComanda) {
+      console.log(percorsoDb);
+      const dataRef = ref(database, percorsoDb);
+      const oggetto = { numeroComanda: numeroComanda.length + 1 };
+      const updates = {};
+      updates[numeroComanda.length] = oggetto;
+
+      update(dataRef, updates)
+        .then(() => {
+          res.status(200).json({
+            code: res.statusCode,
+            esito: true,
+            response: oggetto.numeroComanda,
+          });
+        })
+        .catch((error) => {
+          console.error("Aggiornamento non riuscito: " + error);
+          res.status(500).json({
+            code: res.statusCode,
+            esito: false,
+            message: "Aggiornamento non riuscito",
+          });
+        });
+    } else {
+      console.log("JSON non valido");
+      res.status(500).json({
+        code: res.statusCode,
+        esito: false,
+        message: "Aggiornamento non riuscito",
+      });
+    }
+  } catch (error) {
+    console.error("Aggiornamento non riuscito: ", error);
+    res.status(500).json({
+      code: res.statusCode,
+      esito: false,
+      message: "Aggiornamento non riuscito",
+    });
+  }
+};
+
+// Funzione per salvare la camanda nel database Firebase
 const saveComanda = async (req, res) => {
   const jsonString = req.body;
-  console.log(jsonString);
   try {
-    // Controllo che il json sia valido
-    // Controllo che il json sia valido
-
+    // Controllo che il json sia valido && che il numero comanda sia maggiore di 0
     if (
       isValidJSON(jsonString) &&
       jsonString.numeroComanda &&
@@ -212,8 +159,6 @@ const saveComanda = async (req, res) => {
       console.log(percorsoDb);
       const dataRef = ref(database, percorsoDb);
 
-      //const newPostKey = push(child(ref(database), "comanda")).requestNumber_;
-      //console.log("CHE newPostKey ", newPostKey);
       const oggetto = {
         numeroComanda: jsonString.numeroComanda,
         comanda: jsonString.comanda,
