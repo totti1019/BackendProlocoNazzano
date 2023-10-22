@@ -8,6 +8,8 @@ const authRoutes = require("./routers/auth");
 const { authenticateToken } = require("./middlewares/auth");
 const menuRouters = require("./routers/menu");
 const numeratoreRouters = require("./routers/numeratore");
+const comandaRouters = require("./routers/comanda");
+
 const configureWebSocket = require("./middlewares/websocket");
 
 dotenv.config();
@@ -55,6 +57,7 @@ app.use("/users", authenticateToken, usersRouters);
 app.use("/auth", authRoutes);
 app.use("/menu", menuRouters);
 app.use("/numeratore", numeratoreRouters);
+app.use("/comanda", comandaRouters);
 
 // Rotta di benvenuto
 app.get("/", (req, res) => {
