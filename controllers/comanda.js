@@ -7,6 +7,7 @@ const {
   set,
   remove,
   update,
+  runTransaction,
 } = require("firebase/database");
 
 require("dotenv").config();
@@ -34,11 +35,9 @@ const getNumeroComanda = async (req, res) => {
     await get(dataRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
-          const data = snapshot.val();
-          console.log(data);
-          updateNumeroComanda(req, res, data);
+          updateNumeroComanda(req, res);
         } else {
-          saveNumeroComanda(req, res, 1);
+          updateNumeroComanda(req, res);
         }
       })
       .catch((error) => {
@@ -59,83 +58,47 @@ const getNumeroComanda = async (req, res) => {
   }
 };
 
-// Funzione per scrivere dati nel database Firebase
-const saveNumeroComanda = async (req, res, numeroComanda) => {
-  try {
-    // Controllo che il json sia valido
-    if (numeroComanda) {
-      const dataRef = ref(database, percorsoDb);
-      // Utilizza il metodo 'set' per sovrascrivere i dati nel percorso specificato
-      const oggetto = [{ numeroComanda: 1 }];
-
-      set(dataRef, oggetto)
-        .then(() => {
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: oggetto.numeroComanda,
-          });
-        })
-        .catch((error) => {
-          console.error("Numero non salvato: " + error);
-          res.status(500).json({
-            code: res.statusCode,
-            esito: false,
-            message: "Numero non salvato",
-          });
-        });
-    } else {
-      console.log("JSON non valido");
-      res.status(500).json({
-        code: res.statusCode,
-        esito: false,
-        message: "Numero non salvato: JSON non valido",
-      });
-    }
-  } catch (error) {
-    console.error("Numero non salvato: ", error);
-    res.status(500).json({
-      code: res.statusCode,
-      esito: false,
-      message: "Numero non salvato",
-    });
-  }
-};
-
 // Funzione per aggiornare dati nel database Firebase
-const updateNumeroComanda = async (req, res, numeroComanda) => {
+const updateNumeroComanda = async (req, res) => {
   try {
-    if (numeroComanda) {
-      console.log(percorsoDb);
-      const dataRef = ref(database, percorsoDb);
-      const oggetto = { numeroComanda: numeroComanda.length + 1 };
-      const updates = {};
-      updates[numeroComanda.length] = oggetto;
+    const dataRef = ref(database, percorsoDb);
 
-      update(dataRef, updates)
-        .then(() => {
+    runTransaction(dataRef, (currentData) => {
+      if (currentData === null) {
+        // Se non ci sono dati, crea la prima comanda
+        return [{ numeroComanda: 1 }];
+      } else {
+        // Altrimenti, aggiungi una nuova comanda con un numero incrementato
+        const newNumeroComanda = currentData.length + 1;
+        currentData.push({ numeroComanda: newNumeroComanda });
+        return currentData;
+      }
+    })
+      .then((result) => {
+        if (result.committed) {
+          console.log(result.snapshot.val()[result.snapshot.val().length - 1]);
           res.status(200).json({
             code: res.statusCode,
             esito: true,
-            response: oggetto.numeroComanda,
+            response: result.snapshot.val()[result.snapshot.val().length - 1],
           });
-        })
-        .catch((error) => {
-          console.error("Aggiornamento non riuscito: " + error);
+        } else {
+          console.error("Aggiornamento non riuscito");
           res.status(500).json({
             code: res.statusCode,
             esito: false,
             message: "Aggiornamento non riuscito",
           });
+        }
+      })
+      .catch((error) => {
+        console.error("Aggiornamento non riuscito: " + error);
+        res.status(500).json({
+          code: res.statusCode,
+          esito: false,
+          message: "Aggiornamento non riuscito",
         });
-    } else {
-      console.log("JSON non valido");
-      res.status(500).json({
-        code: res.statusCode,
-        esito: false,
-        message: "Aggiornamento non riuscito",
       });
-    }
   } catch (error) {
     console.error("Aggiornamento non riuscito: ", error);
     res.status(500).json({
