@@ -60,28 +60,37 @@ const getNumeroComanda = async (req, res) => {
 
 // Funzione per aggiornare dati nel database Firebase
 const updateNumeroComanda = async (req, res) => {
+  let newNumeroComanda = 0;
   try {
     const dataRef = ref(database, percorsoDb);
 
     runTransaction(dataRef, (currentData) => {
       if (currentData === null) {
         // Se non ci sono dati, crea la prima comanda
-        return [{ numeroComanda: 1 }];
+        newNumeroComanda = 1;
+        return [{ numeroComanda: newNumeroComanda }];
       } else {
         // Altrimenti, aggiungi una nuova comanda con un numero incrementato
-        const newNumeroComanda = currentData.length + 1;
+        newNumeroComanda = currentData.length + 1;
         currentData.push({ numeroComanda: newNumeroComanda });
         return currentData;
       }
     })
       .then((result) => {
         if (result.committed) {
-          console.log(result.snapshot.val()[result.snapshot.val().length - 1]);
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: result.snapshot.val()[result.snapshot.val().length - 1],
-          });
+          if (newNumeroComanda > 0) {
+            res.status(200).json({
+              code: res.statusCode,
+              esito: true,
+              response: { numeroComanda: newNumeroComanda },
+            });
+          } else {
+            res.status(500).json({
+              code: res.statusCode,
+              esito: false,
+              message: "Aggiornamento non riuscito",
+            });
+          }
         } else {
           console.error("Aggiornamento non riuscito");
           res.status(500).json({
