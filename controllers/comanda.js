@@ -4,6 +4,8 @@ const {
   getDatabase,
   ref,
   update,
+  get,
+  child,
   runTransaction,
 } = require("firebase/database");
 
@@ -142,6 +144,65 @@ const saveComanda = async (req, res) => {
   }
 };
 
+// Funzione per salvare la camanda nel database Firebase
+const leggiVecchiaComanda = async (req, res) => {
+  const jsonString = req.body;
+
+  try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+
+    if (!isValidJSON(jsonString)) {
+      throw new Error("JSON non valido");
+    }
+
+    if (
+      !jsonString.numeroVecchiaComanda ||
+      jsonString.numeroVecchiaComanda <= 0
+    ) {
+      throw new Error("Il campo 'numeroVecchiaComanda' non è valido");
+    }
+
+    // Creazione di un riferimento alla posizione specifica del database
+    const dataRef = ref(database, percorsoDb);
+
+    const numeroVecchiaComanda = jsonString.numeroVecchiaComanda.toString();
+
+    // Esegui la query per cercare la comanda
+    const comandaSnapshot = await get(child(dataRef, numeroVecchiaComanda));
+
+    if (comandaSnapshot.exists()) {
+      const comanda = comandaSnapshot.val();
+      res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: comanda,
+        message: "Comanda trovata",
+      });
+    } else {
+      console.log("Comanda non trovata");
+      res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: null,
+        message: "Comanda non trovata",
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      code: res.statusCode,
+      esito: false,
+      message: error.message || "Errore sconosciuto",
+    });
+  }
+};
+
 function isValidJSON(text) {
   try {
     if (Array.isArray(text)) {
@@ -159,4 +220,5 @@ function isValidJSON(text) {
 module.exports = {
   updateNumeroComanda,
   saveComanda,
+  leggiVecchiaComanda,
 };
