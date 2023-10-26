@@ -146,6 +146,7 @@ const saveComanda = async (req, res) => {
 
 // Funzione per salvare la camanda nel database Firebase
 const leggiVecchiaComanda = async (req, res) => {
+  const NUMERO_COMANDA_OFFSET = 1;
   const jsonString = req.body;
 
   try {
@@ -172,7 +173,9 @@ const leggiVecchiaComanda = async (req, res) => {
     // Creazione di un riferimento alla posizione specifica del database
     const dataRef = ref(database, percorsoDb);
 
-    const numeroVecchiaComanda = jsonString.numeroVecchiaComanda.toString();
+    const numeroVecchiaComanda = (
+      jsonString.numeroVecchiaComanda - NUMERO_COMANDA_OFFSET
+    ).toString();
 
     // Esegui la query per cercare la comanda
     const comandaSnapshot = await get(child(dataRef, numeroVecchiaComanda));
