@@ -113,57 +113,45 @@ const updateNumeroComanda = async (req, res) => {
 
 // Funzione per salvare la camanda nel database Firebase
 const saveComanda = async (req, res) => {
+  const NUMERO_COMANDA_OFFSET = 1;
   const jsonString = req.body;
+
   try {
-    // Controllo che il json sia valido && che il numero comanda sia maggiore di 0
-    if (
-      isValidJSON(jsonString) &&
-      jsonString.numeroComanda &&
-      jsonString.numeroComanda > 0
-    ) {
-      console.log(percorsoDb);
-      const dataRef = ref(database, percorsoDb);
-
-      const oggetto = {
-        numeroComanda: jsonString.numeroComanda,
-        comanda: jsonString.comanda,
-        pagamento: jsonString.pagamento,
-        totaleComanda: jsonString.totaleComanda,
-        numeroCassa: jsonString.numeroCassa,
-      };
-      const updates = {};
-      updates[jsonString.numeroComanda - 1] = oggetto;
-
-      update(dataRef, updates)
-        .then(() => {
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: `Comanda numero ${jsonString.numeroComanda} salvata correttamente`,
-          });
-        })
-        .catch((error) => {
-          console.error("Comanda non salvata: " + error);
-          res.status(500).json({
-            code: res.statusCode,
-            esito: false,
-            message: "Comanda non salvata",
-          });
-        });
-    } else {
-      console.log("JSON non valido");
-      res.status(500).json({
-        code: res.statusCode,
-        esito: false,
-        message: "Comanda non salvata: JSON non valido",
-      });
+    if (!isValidJSON(jsonString)) {
+      throw new Error("JSON non valido");
     }
+
+    if (!jsonString.numeroComanda || jsonString.numeroComanda <= 0) {
+      throw new Error("Il campo 'numeroComanda' non è valido");
+    }
+
+    const dataRef = ref(database, percorsoDb);
+    const newNumeroComanda = jsonString.numeroComanda;
+
+    const oggetto = {
+      numeroComanda: newNumeroComanda,
+      comanda: jsonString.comanda,
+      pagamento: jsonString.pagamento,
+      totaleComanda: jsonString.totaleComanda,
+      numeroCassa: jsonString.numeroCassa,
+    };
+
+    const updates = {};
+    updates[newNumeroComanda - NUMERO_COMANDA_OFFSET] = oggetto;
+
+    await update(dataRef, updates);
+
+    res.status(200).json({
+      code: res.statusCode,
+      esito: true,
+      response: { numeroComanda: newNumeroComanda },
+      message: `Comanda numero ${newNumeroComanda} salvata correttamente`,
+    });
   } catch (error) {
-    console.error("Comanda non salvata: ", error);
-    res.status(500).json({
+    res.status(400).json({
       code: res.statusCode,
       esito: false,
-      message: "Comanda non salvata",
+      message: error.message || "Errore sconosciuto",
     });
   }
 };
