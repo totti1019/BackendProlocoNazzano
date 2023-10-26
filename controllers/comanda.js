@@ -3,12 +3,13 @@ const { initializeApp } = require("firebase/app");
 const {
   getDatabase,
   ref,
-  get,
   update,
   runTransaction,
 } = require("firebase/database");
 
 require("dotenv").config();
+
+const utils = require("./utils/utils");
 
 // Configura Firebase con le credenziali del tuo progetto
 const firebaseConfig = {
@@ -24,11 +25,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-const percorsoDb = "prolocoNazzano/polenta2023/comande";
+let percorsoDb = ``;
 
 // Funzione per aggiornare dati nel database Firebase
 const updateNumeroComanda = async (req, res) => {
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
     const dataRef = ref(database, percorsoDb);
 
     const result = await runTransaction(dataRef, (currentData) => {
@@ -85,6 +94,15 @@ const saveComanda = async (req, res) => {
   const jsonString = req.body;
 
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+
     if (!isValidJSON(jsonString)) {
       throw new Error("JSON non valido");
     }

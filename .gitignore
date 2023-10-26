@@ -1,2 +1,3 @@
 
 .env
+controllers/utils/sharedData.json

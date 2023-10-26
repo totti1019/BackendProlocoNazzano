@@ -6,6 +6,8 @@ const { Menu } = require("../models/menu");
 
 require("dotenv").config();
 
+const utils = require("./utils/utils");
+
 // Configura Firebase con le credenziali del tuo progetto
 const firebaseConfig = {
   apiKey: process.env.APIKEY_FIREBASE,
@@ -20,10 +22,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-const percorsoDb = "prolocoNazzano/polenta2023/menu";
+let percorsoDb = ``;
 
 const getAllMenu = async (req, res) => {
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+
     const dataRef = ref(database, percorsoDb);
 
     await get(dataRef)
@@ -68,8 +79,22 @@ const saveMenu = async (req, res) => {
   const jsonString = req.body;
   try {
     // Controllo che il json sia valido
-    if (isValidJSON(jsonString)) {
-      const dataRef = ref(database, percorsoDb);
+    if (
+      isValidJSON(jsonString) &&
+      jsonString.sagra &&
+      jsonString.sagra !== ""
+    ) {
+      // Salvataggio del valore in un file
+      const sharedData = {
+        sagraAttuale: jsonString.sagra,
+      };
+
+      // Salvataggio dei dati nelle shared
+      utils.saveSharedData(sharedData);
+
+      const percorso = `prolocoNazzano/${jsonString.sagra}/menu`;
+      console.log(percorso);
+      const dataRef = ref(database, percorso);
       // Utilizza il metodo 'set' per sovrascrivere i dati nel percorso specificato
       set(dataRef, jsonString)
         .then(() => {
@@ -107,8 +132,16 @@ const saveMenu = async (req, res) => {
 
 // Elimino tutta la tabella del menu
 const deleteMenu = async (req, res) => {
-  const dataRef = ref(database, percorsoDb);
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+    const dataRef = ref(database, percorsoDb);
     // Utilizza il metodo 'remove' per eliminare il nodo specificato
     remove(dataRef)
       .then(() => {

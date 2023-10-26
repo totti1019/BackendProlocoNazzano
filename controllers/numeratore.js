@@ -4,6 +4,8 @@ const { getDatabase, ref, get, set, remove } = require("firebase/database");
 
 require("dotenv").config();
 
+const utils = require("./utils/utils");
+
 // Configura Firebase con le credenziali del tuo progetto
 const firebaseConfig = {
   apiKey: process.env.APIKEY_FIREBASE,
@@ -18,11 +20,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-const percorsoDb = "prolocoNazzano/polenta2023/numeratore";
-
 // Funzione per leggere dati nel database Firebase
 const getNumber = async (req, res) => {
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+
     const dataRef = ref(database, percorsoDb);
 
     await get(dataRef)
@@ -66,6 +75,14 @@ const getNumber = async (req, res) => {
 const saveNumber = async (req, res) => {
   const jsonString = req.body;
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
     // Controllo che il json sia valido
     if (isValidJSON(jsonString)) {
       const dataRef = ref(database, percorsoDb);
@@ -106,8 +123,16 @@ const saveNumber = async (req, res) => {
 
 // Elimino tutta la tabella del menu
 const deleteNumber = async (req, res) => {
-  const dataRef = ref(database, percorsoDb);
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = utils.loadSharedData();
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+    const dataRef = ref(database, percorsoDb);
     // Utilizza il metodo 'remove' per eliminare il nodo specificato
     remove(dataRef)
       .then(() => {
