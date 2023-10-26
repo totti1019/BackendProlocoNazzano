@@ -4,8 +4,6 @@ const {
   getDatabase,
   ref,
   get,
-  set,
-  remove,
   update,
   runTransaction,
 } = require("firebase/database");
@@ -27,36 +25,6 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 const percorsoDb = "prolocoNazzano/polenta2023/comande";
-
-// Funzione per scrivere dati nel database Firebase
-const getNumeroComanda = async (req, res) => {
-  const dataRef = ref(database, percorsoDb);
-  try {
-    await get(dataRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          updateNumeroComanda(req, res);
-        } else {
-          updateNumeroComanda(req, res);
-        }
-      })
-      .catch((error) => {
-        console.error("Numero non letto: " + error);
-        res.status(500).json({
-          code: res.statusCode,
-          esito: false,
-          message: "Numero non letto: " + error.message,
-        });
-      });
-  } catch (error) {
-    console.error("Numero non letto: ", error);
-    res.status(500).json({
-      code: res.statusCode,
-      esito: false,
-      message: "Numero non letto",
-    });
-  }
-};
 
 // Funzione per aggiornare dati nel database Firebase
 const updateNumeroComanda = async (req, res) => {
@@ -156,37 +124,6 @@ const saveComanda = async (req, res) => {
   }
 };
 
-// Elimino tutta la tabella del menu
-const deleteMenu = async (req, res) => {
-  const dataRef = ref(database, percorsoDb);
-  try {
-    // Utilizza il metodo 'remove' per eliminare il nodo specificato
-    remove(dataRef)
-      .then(() => {
-        res.status(200).json({
-          code: res.statusCode,
-          esito: true,
-          response: "Menu eliminato con successo",
-        });
-      })
-      .catch((error) => {
-        console.error("Menu non eliminato: " + error);
-        res.status(500).json({
-          code: res.statusCode,
-          esito: false,
-          message: "Menu non eliminato",
-        });
-      });
-  } catch (error) {
-    console.error("Menu non eliminato: ", error);
-    res.status(500).json({
-      code: res.statusCode,
-      esito: false,
-      message: "Menu non eliminato",
-    });
-  }
-};
-
 function isValidJSON(text) {
   try {
     if (Array.isArray(text)) {
@@ -202,7 +139,6 @@ function isValidJSON(text) {
 }
 
 module.exports = {
-  getNumeroComanda,
+  updateNumeroComanda,
   saveComanda,
-  deleteMenu,
 };
