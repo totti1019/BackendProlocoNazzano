@@ -63,7 +63,7 @@ const updateNumeroComanda = async (req, res) => {
   try {
     const dataRef = ref(database, percorsoDb);
 
-    runTransaction(dataRef, (currentData) => {
+    const result = await runTransaction(dataRef, (currentData) => {
       if (!currentData) {
         currentData = [];
       }
@@ -74,38 +74,39 @@ const updateNumeroComanda = async (req, res) => {
       // Aggiungi il nuovo oggetto all'array
       currentData.push({ numeroComanda: newNumeroComanda });
       return currentData;
-    })
-      .then((result) => {
-        if (result.committed) {
-          const newNumeroComanda = result.snapshot.val().length;
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: { numeroComanda: newNumeroComanda },
-          });
-        } else {
-          console.error("Aggiornamento non riuscito");
-          res.status(500).json({
-            code: res.statusCode,
-            esito: false,
-            message: "Aggiornamento non riuscito",
-          });
-        }
-      })
-      .catch((error) => {
-        console.error("Aggiornamento non riuscito: " + error);
+    });
+
+    if (result.committed) {
+      const newNumeroComanda = result.snapshot.val().length;
+      res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: { numeroComanda: newNumeroComanda },
+      });
+    } else {
+      const error = result.error;
+      if (error.code === "ABORTED") {
+        res.status(409).json({
+          code: res.statusCode,
+          esito: false,
+          message: "Comanda già esistente",
+        });
+      } else {
         res.status(500).json({
           code: res.statusCode,
           esito: false,
           message: "Aggiornamento non riuscito",
         });
-      });
+      }
+    }
   } catch (error) {
-    console.error("Aggiornamento non riuscito: ", error);
+    console.error(
+      "Errore durante l'aggiornamento del numero di comanda: " + error
+    );
     res.status(500).json({
       code: res.statusCode,
       esito: false,
-      message: "Aggiornamento non riuscito",
+      message: "Errore durante l'aggiornamento del numero di comanda",
     });
   }
 };
