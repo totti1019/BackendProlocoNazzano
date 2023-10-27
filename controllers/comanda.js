@@ -265,15 +265,15 @@ const updateVecchiaComanda = async (req, res) => {
 const leggiIncasso = async (req, res) => {
   const jsonString = req.body;
 
-  if (!isValidJSON(jsonString)) {
-    throw new Error("JSON non valido");
-  }
-
-  if (!jsonString.numeroCassa || jsonString.numeroCassa <= 0) {
-    throw new Error("Il campo 'numeroCassa' non è valido");
-  }
-
   try {
+    if (!isValidJSON(jsonString)) {
+      throw new Error("JSON non valido");
+    }
+
+    if (!jsonString.numeroCassa || jsonString.numeroCassa <= 0) {
+      throw new Error("Il campo 'numeroCassa' non è valido");
+    }
+
     const numeroCassaDesiderato = jsonString.numeroCassa; // Numero di cassa desiderato
 
     // Carica i dati delle comande da Firebase
