@@ -261,6 +261,57 @@ const updateVecchiaComanda = async (req, res) => {
   }
 };
 
+// Funzione per salvare la camanda nel database Firebase
+const leggiIncasso = async (req, res) => {
+  try {
+    // Carica i dati delle comande da Firebase
+    const loadedSharedData = await utils.loadSharedData();
+    if (loadedSharedData) {
+      const percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
+
+      // Crea un riferimento alla posizione delle comande nel database Firebase
+      const dataRef = ref(database, percorsoDb);
+
+      // Ottieni uno snapshot di tutte le comande
+      const comandeSnapshot = await get(dataRef);
+
+      if (comandeSnapshot.exists()) {
+        const comandeData = comandeSnapshot.val();
+
+        // Estrai il totale e il metodo di pagamento di ciascuna comanda
+        const incasso = comandeData.map((comanda) => ({
+          totaleComanda: comanda.totaleComanda,
+          pagamento: comanda.pagamento,
+        }));
+        console.log(incasso);
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          response: incasso,
+          message: "Elenco degli incassi scaricato correttamente",
+        });
+      } else {
+        console.log("Ancora nessun incasso");
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          response: [],
+          message: "Ancora nessun incasso",
+        });
+      }
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+  } catch (error) {
+    res.status(400).json({
+      code: res.statusCode,
+      esito: false,
+      message: error.message || "Errore sconosciuto",
+    });
+  }
+};
+
 function isValidJSON(text) {
   try {
     if (Array.isArray(text)) {
@@ -280,4 +331,5 @@ module.exports = {
   saveComanda,
   leggiVecchiaComanda,
   updateVecchiaComanda,
+  leggiIncasso,
 };
