@@ -263,7 +263,19 @@ const updateVecchiaComanda = async (req, res) => {
 
 // Funzione per salvare la camanda nel database Firebase
 const leggiIncasso = async (req, res) => {
+  const jsonString = req.body;
+
+  if (!isValidJSON(jsonString)) {
+    throw new Error("JSON non valido");
+  }
+
+  if (!jsonString.numeroCassa || jsonString.numeroCassa <= 0) {
+    throw new Error("Il campo 'numeroCassa' non è valido");
+  }
+
   try {
+    const numeroCassaDesiderato = jsonString.numeroCassa; // Numero di cassa desiderato
+
     // Carica i dati delle comande da Firebase
     const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
@@ -278,18 +290,33 @@ const leggiIncasso = async (req, res) => {
       if (comandeSnapshot.exists()) {
         const comandeData = comandeSnapshot.val();
 
-        // Estrai il totale e il metodo di pagamento di ciascuna comanda
-        const incasso = comandeData.map((comanda) => ({
-          totaleComanda: comanda.totaleComanda,
-          pagamento: comanda.pagamento,
-        }));
-        console.log(incasso);
-        res.status(200).json({
-          code: res.statusCode,
-          esito: true,
-          response: incasso,
-          message: "Elenco degli incassi scaricato correttamente",
-        });
+        // Filtra le comande con il numero di cassa desiderato
+        const comandeFiltrate = comandeData.filter(
+          (comanda) => comanda.numeroCassa === numeroCassaDesiderato
+        );
+
+        if (comandeFiltrate.length > 0) {
+          // Estrai il totale e il metodo di pagamento di ciascuna comanda
+          const incasso = comandeFiltrate.map((comanda) => ({
+            totaleComanda: comanda.totaleComanda,
+            pagamento: comanda.pagamento,
+          }));
+          console.log(incasso);
+          res.status(200).json({
+            code: res.statusCode,
+            esito: true,
+            response: incasso,
+            message: "Elenco degli incassi scaricato correttamente",
+          });
+        } else {
+          console.log("Ancora nessun incasso");
+          res.status(200).json({
+            code: res.statusCode,
+            esito: true,
+            response: [],
+            message: "Ancora nessun incasso",
+          });
+        }
       } else {
         console.log("Ancora nessun incasso");
         res.status(200).json({
