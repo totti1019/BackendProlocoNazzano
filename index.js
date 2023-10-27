@@ -9,6 +9,7 @@ const { authenticateToken } = require("./middlewares/auth");
 const menuRouters = require("./routers/menu");
 const numeratoreRouters = require("./routers/numeratore");
 const comandaRouters = require("./routers/comanda");
+const utilsRouters = require("./routers/utils");
 
 const configureWebSocket = require("./middlewares/websocket");
 
@@ -58,6 +59,7 @@ app.use("/auth", authRoutes);
 app.use("/menu", menuRouters);
 app.use("/numeratore", numeratoreRouters);
 app.use("/comanda", comandaRouters);
+app.use("/percorso", utilsRouters);
 
 // Rotta di benvenuto
 app.get("/", (req, res) => {
