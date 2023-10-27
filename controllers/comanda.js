@@ -186,7 +186,7 @@ const leggiVecchiaComanda = async (req, res) => {
         code: res.statusCode,
         esito: true,
         response: comanda,
-        message: `Comanda numero ${jsonString.numeroVecchiaComanda} caricata`,
+        message: `Comanda numero ${jsonString.numeroVecchiaComanda} caricata correttamente`,
       });
     } else {
       console.log("Comanda non trovata");
