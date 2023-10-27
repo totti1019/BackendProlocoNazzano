@@ -1,6 +1,13 @@
 const { initializeApp } = require("firebase/app");
 
-const { getDatabase, ref, get, set, remove } = require("firebase/database");
+const {
+  getDatabase,
+  ref,
+  get,
+  set,
+  remove,
+  update,
+} = require("firebase/database");
 
 const { Menu } = require("../models/menu");
 
@@ -27,7 +34,7 @@ let percorsoDb = ``;
 const getAllMenu = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
     } else {
@@ -93,25 +100,23 @@ const saveMenu = async (req, res) => {
       utils.saveSharedData(sharedData);
 
       const percorso = `prolocoNazzano/${jsonString.sagra}/menu`;
-      console.log(percorso);
+
       const dataRef = ref(database, percorso);
-      // Utilizza il metodo 'set' per sovrascrivere i dati nel percorso specificato
-      set(dataRef, jsonString)
-        .then(() => {
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: "Menu salvato correttamente",
-          });
-        })
-        .catch((error) => {
-          console.error("Menu non salvato: " + error);
-          res.status(500).json({
-            code: res.statusCode,
-            esito: false,
-            message: "Menu non salvato",
-          });
+
+      // Utilizza il metodo 'set' per sovrascrivere i dati del menu nel percorso specificato
+
+      const percorsoSagra = `prolocoNazzano`;
+      const dataRefSagra = ref(database, percorsoSagra);
+
+      // Utilizza il metodo 'set' per sovrascrivere i dati della sagra e update per salvare il percorso della sagra attuale
+      await set(dataRef, jsonString).then(() => {
+        update(dataRefSagra, { sagraAttuale: jsonString.sagra });
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          response: "Menu salvato correttamente",
         });
+      });
     } else {
       console.log("JSON non valido");
       res.status(500).json({
@@ -134,7 +139,7 @@ const saveMenu = async (req, res) => {
 const deleteMenu = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
     } else {

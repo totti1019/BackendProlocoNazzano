@@ -33,7 +33,7 @@ let percorsoDb = ``;
 const updateNumeroComanda = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
     } else {
@@ -97,7 +97,7 @@ const saveComanda = async (req, res) => {
 
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
     } else {
@@ -151,7 +151,7 @@ const leggiVecchiaComanda = async (req, res) => {
 
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
     } else {

@@ -24,7 +24,7 @@ const database = getDatabase(app);
 const getNumber = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
@@ -76,7 +76,7 @@ const saveNumber = async (req, res) => {
   const jsonString = req.body;
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
@@ -125,7 +125,7 @@ const saveNumber = async (req, res) => {
 const deleteNumber = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = utils.loadSharedData();
+    const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
