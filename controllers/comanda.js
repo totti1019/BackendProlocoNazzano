@@ -186,7 +186,7 @@ const leggiVecchiaComanda = async (req, res) => {
         code: res.statusCode,
         esito: true,
         response: comanda,
-        message: "Comanda trovata",
+        message: `Comanda ${numeroVecchiaComanda} caricata`,
       });
     } else {
       console.log("Comanda non trovata");
@@ -194,7 +194,7 @@ const leggiVecchiaComanda = async (req, res) => {
         code: res.statusCode,
         esito: true,
         response: null,
-        message: "Comanda non trovata",
+        message: `Comanda ${numeroVecchiaComanda} non trovata`,
       });
     }
   } catch (error) {
