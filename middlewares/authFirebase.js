@@ -3,7 +3,7 @@ const { getAuth, signInWithCustomToken } = require("firebase/auth");
 // Middleware per verificare l'autenticazione prima di consentire una chiamata API
 const requireAuthFirebase = async (req, res, next) => {
   try {
-    console.error(req);
+    console.error(req.headers);
     const authHeader = req.headers["authorization"];
     console.error(authHeader);
     const token = authHeader && authHeader.split(" ")[1];
