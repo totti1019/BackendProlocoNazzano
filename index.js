@@ -56,7 +56,7 @@ app.use(express.json());
 
 // Collegamento delle rotte alle relative parti dell'app
 app.use("/users", authenticateToken, usersRouters);
-app.use("/auth", authRoutes);
+app.use("/auth", requireAuthFirebase, authRoutes);
 app.use("/menu", requireAuthFirebase, menuRouters);
 app.use("/numeratore", requireAuthFirebase, numeratoreRouters);
 app.use("/comanda", requireAuthFirebase, comandaRouters);
