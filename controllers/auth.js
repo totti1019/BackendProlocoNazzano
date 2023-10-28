@@ -13,31 +13,10 @@ const client = new OAuth2Client();
 
 require("dotenv").config();
 
-const admin = require("firebase-admin");
-const path = require("path");
-
-const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-
-console.log(credentialsPath);
-
-if (!credentialsPath) {
-  console.error(
-    "La variabile d'ambiente FIREBASE_CREDENTIALS_PATH non è configurata."
-  );
-  process.exit(1);
-}
-
-const serviceAccount = require(path.join(__dirname, "..", credentialsPath));
-
-try {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-  console.log("Firebase Admin inizializzato con successo.");
-} catch (error) {
-  console.error("Errore durante l'inizializzazione di Firebase Admin:", error);
-  process.exit(1);
-}
+const {
+  adminFirebase,
+  appFirebase,
+} = require("../controllers/utils/config-admin-firebase"); // Importa il modulo di configurazione firebase admin
 
 // METODO PER IL LOGIN DI GOOGLE
 const loginGoogle = async (req, res) => {
@@ -107,7 +86,7 @@ const loginAnonymous = async (req, res) => {
       throw new Error("Parametro non trovato o non corretto");
     }
 
-    admin
+    adminFirebase
       .auth()
       .createCustomToken(uid)
       .then((customToken) => {

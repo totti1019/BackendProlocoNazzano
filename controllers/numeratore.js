@@ -1,24 +1,12 @@
-const { initializeApp } = require("firebase/app");
-
 const { getDatabase, ref, get, set, remove } = require("firebase/database");
 
 require("dotenv").config();
 
 const utils = require("./utils/utils");
 
-// Configura Firebase con le credenziali del tuo progetto
-const firebaseConfig = {
-  apiKey: process.env.APIKEY_FIREBASE,
-  authDomain: process.env.AUTHDOMAIN_FIREBASE,
-  databaseURL: process.env.DATABASEURL_FIREBASE,
-  projectId: process.env.PROJECTID_FIREBASE,
-  storageBucket: process.env.STORAGEBUCKET_FIREBASE,
-  messagingSenderId: process.env.MESSAGGINGSENDERID_FIREBASE,
-  appId: process.env.APPID_FIREBASE,
-};
+const { appFirebase } = require("../controllers/utils/config-admin-firebase"); // Importa il modulo di configurazione firebase admin
 
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+const database = getDatabase(appFirebase);
 
 // Funzione per leggere dati nel database Firebase
 const getNumber = async (req, res) => {

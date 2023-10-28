@@ -10,6 +10,7 @@ const menuRouters = require("./routers/menu");
 const numeratoreRouters = require("./routers/numeratore");
 const comandaRouters = require("./routers/comanda");
 const utilsRouters = require("./routers/utils");
+const { requireAuthFirebase } = require("./middlewares/authFirebase");
 
 const configureWebSocket = require("./middlewares/websocket");
 
@@ -56,9 +57,9 @@ app.use(express.json());
 // Collegamento delle rotte alle relative parti dell'app
 app.use("/users", authenticateToken, usersRouters);
 app.use("/auth", authRoutes);
-app.use("/menu", menuRouters);
-app.use("/numeratore", numeratoreRouters);
-app.use("/comanda", comandaRouters);
+app.use("/menu", requireAuthFirebase, menuRouters);
+app.use("/numeratore", requireAuthFirebase, numeratoreRouters);
+app.use("/comanda", requireAuthFirebase, comandaRouters);
 app.use("/percorso", utilsRouters);
 
 // Rotta di benvenuto
