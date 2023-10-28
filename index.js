@@ -26,7 +26,7 @@ const httpServer = http.createServer(app);
 // Configurazione del WebSocket con Socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://fabiocola.altervista.org",
+    origin: "https://www.fabiocola.altervista.org",
     methods: ["GET", "POST"],
   },
 });
@@ -35,7 +35,7 @@ const io = new Server(httpServer, {
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "https://fabiocola.altervista.org"
+    "https://www.fabiocola.altervista.org"
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
