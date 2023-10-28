@@ -17,7 +17,7 @@ if (!credentialsPath) {
 }
 
 const serviceAccount = require(path.join(__dirname, "../..", credentialsPath));
-
+console.log(credentialsPath);
 try {
   adminFirebase.initializeApp({
     credential: adminFirebase.credential.cert(serviceAccount),
