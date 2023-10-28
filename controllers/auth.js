@@ -3,6 +3,8 @@ const localizable = require("../locales/localizables");
 
 const { check, validationResult } = require("express-validator");
 
+const { getAuth, signInAnonymously, getIdToken } = require("firebase/auth");
+
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -81,31 +83,73 @@ const loginAnonymous = async (req, res) => {
   const { uid } = req.body;
 
   try {
+    const auth = getAuth();
     if (uid === undefined || uid === "") {
-      console.log("Parametro non trovato");
-      throw new Error("Parametro non trovato o non corretto");
+      // E' la prima volta che mi registro quindi creo l'account anonimo in firebase
+      await signInAnonymously(auth)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          if (user) {
+            getIdToken(user)
+              .then((idToken) => {
+                // Creo l'oggetto con uid e token
+                const oggetto = {
+                  uid: user.uid,
+                  token: idToken,
+                };
+                res.status(200).json({
+                  code: res.statusCode,
+                  esito: true,
+                  response: oggetto,
+                  message: "Token creato con successo",
+                });
+              })
+              .catch((error) => {
+                res.status(500).json({
+                  code: res.statusCode,
+                  esito: false,
+                  response: null,
+                  message: "Errore durante la creazione del token",
+                });
+              });
+          } else {
+            // L'utente non è autenticato, gestisci di conseguenza
+          }
+        })
+        .catch((error) => {
+          res.status(400).json({
+            code: res.statusCode,
+            esito: false,
+            message: error.message || "Errore sconosciuto",
+          });
+        });
+    } else {
+      // Ho già UID quindi sono già registrato in firebase
+      adminFirebase
+        .auth()
+        .createCustomToken(uid)
+        .then((customToken) => {
+          // Creo l'oggetto con uid e token
+          const oggetto = {
+            uid: uid,
+            token: customToken,
+          };
+          res.status(200).json({
+            code: res.statusCode,
+            esito: true,
+            response: oggetto,
+            message: "Token creato con successo",
+          });
+        })
+        .catch((error) => {
+          res.status(500).json({
+            code: res.statusCode,
+            esito: false,
+            response: null,
+            message: "Errore durante la creazione del token personalizzato",
+          });
+        });
     }
-
-    adminFirebase
-      .auth()
-      .createCustomToken(uid)
-      .then((customToken) => {
-        res.status(200).json({
-          code: res.statusCode,
-          esito: true,
-          response: customToken,
-          message: "Token creato con successo",
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).json({
-          code: res.statusCode,
-          esito: false,
-          response: null,
-          message: "Errore durante la creazione del token personalizzato",
-        });
-      });
   } catch (error) {
     res.status(400).json({
       code: res.statusCode,
