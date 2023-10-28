@@ -33,18 +33,12 @@ const io = new Server(httpServer, {
 
 // Configurazione delle impostazioni CORS con Express
 app.use((req, res, next) => {
-  /* res.setHeader(
+  res.setHeader(
     "Access-Control-Allow-Origin",
     "https://fabiocola.altervista.org"
-  ); */
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type",
-    "Authorization"
   );
-  /*res.setHeader(
+
+  res.setHeader(
     "Access-Control-Allow-Methods",
     "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE"
   );
@@ -54,7 +48,7 @@ app.use((req, res, next) => {
   );
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Private-Network", true);
-  res.setHeader("Access-Control-Max-Age", 7200); */
+  res.setHeader("Access-Control-Max-Age", 7200);
   next();
 });
 
@@ -63,8 +57,8 @@ app.use(express.json());
 
 // Collegamento delle rotte alle relative parti dell'app
 app.use("/users", authenticateToken, usersRouters);
-app.use("/auth", requireAuthFirebase, authRoutes);
-app.use("/menu", requireAuthFirebase, menuRouters);
+app.use("/auth", authRoutes);
+app.use("/menu", menuRouters);
 app.use("/numeratore", requireAuthFirebase, numeratoreRouters);
 app.use("/comanda", requireAuthFirebase, comandaRouters);
 app.use("/percorso", utilsRouters);
