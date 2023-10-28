@@ -33,9 +33,16 @@ const io = new Server(httpServer, {
 
 // Configurazione delle impostazioni CORS con Express
 app.use((req, res, next) => {
-  res.setHeader(
+  /* res.setHeader(
     "Access-Control-Allow-Origin",
     "https://fabiocola.altervista.org"
+  ); */
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type",
+    "Authorization"
   );
   /*res.setHeader(
     "Access-Control-Allow-Methods",
