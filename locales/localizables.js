@@ -12,6 +12,7 @@ const localizable = {
   passwordMinCaratteri: "La password deve contenere almeno 8 caratteri",
   passwordCaratteriSpeciali:
     "La password deve contenere almeno una lettera maiuscola, una lettera minuscola, un numero e un carattere speciale",
+  uidNonValido: "parametro non valido",
 };
 
 module.exports = localizable;

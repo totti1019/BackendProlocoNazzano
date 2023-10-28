@@ -29,6 +29,11 @@ const validateFields = async (req, res, next) => {
       .withMessage(localizable.passwordNonValida)
       .isString()
       .withMessage(localizable.passwordNonValida),
+    uid: check("uid")
+      .notEmpty()
+      .withMessage(localizable.uidNonValido)
+      .isString()
+      .withMessage(localizable.uidNonValido),
     // Aggiungi altre regole di convalida per gli altri campi
   };
 
