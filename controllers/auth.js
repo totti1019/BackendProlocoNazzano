@@ -105,11 +105,10 @@ const loginAnonymous = async (req, res) => {
                 });
               })
               .catch((error) => {
-                res.status(500).json({
+                res.status(400).json({
                   code: res.statusCode,
                   esito: false,
-                  response: null,
-                  message: "Errore durante la creazione del token",
+                  message: error.message || "Errore sconosciuto",
                 });
               });
           } else {
