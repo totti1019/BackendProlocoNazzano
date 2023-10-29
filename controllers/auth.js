@@ -84,83 +84,60 @@ const loginAnonymous = async (req, res) => {
   const { uid } = req.body;
 
   try {
-    // Caricamento dei dati dalle shared
+    // Precarico i dati nel percorso
     const loadedSharedData = await utils.loadSharedData();
-    if (loadedSharedData) {
-      console.log("Precarico il percorso");
-    } else {
+
+    if (!loadedSharedData) {
       console.log("Impossibile caricare i dati.");
       throw new Error("Impossibile caricare i dati.");
     }
 
     const auth = getAuth();
-    if (uid === undefined || uid === "") {
-      // E' la prima volta che mi registro quindi creo l'account anonimo in firebase
-      await signInAnonymously(auth)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          if (user) {
-            getIdToken(user)
-              .then((idToken) => {
-                // Creo l'oggetto con uid e token
-                const oggetto = {
-                  uid: user.uid,
-                  token: idToken,
-                };
-                res.status(200).json({
-                  code: res.statusCode,
-                  esito: true,
-                  response: oggetto,
-                  message: "Token creato con successo",
-                });
-              })
-              .catch((error) => {
-                res.status(400).json({
-                  code: res.statusCode,
-                  esito: false,
-                  message: error.message || "Errore sconosciuto",
-                });
-              });
-          } else {
-            // L'utente non è autenticato, gestisci di conseguenza
-          }
-        })
-        .catch((error) => {
-          res.status(400).json({
-            code: res.statusCode,
-            esito: false,
-            message: error.message || "Errore sconosciuto",
-          });
+
+    if (!uid) {
+      const userCredential = await signInAnonymously(auth);
+      const user = userCredential.user;
+
+      if (!user) {
+        return res.status(400).json({
+          code: res.statusCode,
+          esito: false,
+          message: "Utente non autenticato",
         });
-    } else {
-      // Ho già UID quindi sono già registrato in firebase
-      adminFirebase
+      }
+
+      const customToken = await adminFirebase
         .auth()
-        .createCustomToken(uid)
-        .then((customToken) => {
-          // Creo l'oggetto con uid e token
-          const oggetto = {
-            uid: uid,
-            token: customToken,
-          };
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: oggetto,
-            message: "Token creato con successo",
-          });
-        })
-        .catch((error) => {
-          res.status(500).json({
-            code: res.statusCode,
-            esito: false,
-            response: null,
-            message: "Errore durante la creazione del token personalizzato",
-          });
-        });
+        .createCustomToken(user.uid);
+
+      const oggetto = {
+        uid: user.uid,
+        token: customToken,
+      };
+
+      return res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: oggetto,
+        message: "Token creato con successo",
+      });
+    } else {
+      const customToken = await adminFirebase.auth().createCustomToken(uid);
+
+      const oggetto = {
+        uid: uid,
+        token: customToken,
+      };
+
+      return res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: oggetto,
+        message: "Token creato con successo",
+      });
     }
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       code: res.statusCode,
       esito: false,
       message: error.message || "Errore sconosciuto",
