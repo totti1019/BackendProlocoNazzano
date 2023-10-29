@@ -1,5 +1,6 @@
 // Import delle librerie e moduli necessari
 const express = require("express");
+const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
@@ -20,7 +21,9 @@ const PORT = process.env.PORT || 3000;
 
 // Configura l'app Express
 const app = express();
-
+app.use(cors());
+// Impostazione del middleware per il parsing del corpo delle richieste come JSON
+app.use(express.json());
 const httpServer = http.createServer(app);
 
 // Configurazione del WebSocket con Socket.io
@@ -32,7 +35,7 @@ const io = new Server(httpServer, {
 });
 
 // Configurazione delle impostazioni CORS con Express
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://fabiocola.altervista.org"
@@ -52,6 +55,7 @@ app.use((req, res, next) => {
   // Aggiungi un nuovo blocco per gestire le richieste OPTIONS
   if (req.method === "OPTIONS") {
     // Rispondi alle richieste OPTIONS con i dettagli CORS appropriati
+    res.set("Access-Control-Allow-Origin", "https://fabiocola.altervista.org");
     res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
     res.status(200).end();
@@ -60,10 +64,7 @@ app.use((req, res, next) => {
     console.log("ALTRO: ", req.method);
     next();
   }
-});
-
-// Impostazione del middleware per il parsing del corpo delle richieste come JSON
-app.use(express.json());
+}); */
 
 // Collegamento delle rotte alle relative parti dell'app
 app.use("/users", authenticateToken, usersRouters);
