@@ -3,14 +3,14 @@ const { getAuth, signInWithCustomToken } = require("firebase/auth");
 // Middleware per verificare l'autenticazione prima di consentire una chiamata API
 const requireAuthFirebase = async (req, res, next) => {
   try {
-    console.error("CERCO IL ROKEN ", req.headers.authorization);
-    const authHeader = req.headers["authorization"];
-    console.error(authHeader);
-    const token = authHeader && authHeader.split(" ")[1];
+    console.error("CERCO IL TOKEN ", req.headers);
+    //const authHeader = req.headers["authorization"];
+    // console.error(authHeader);
+    // const token = authHeader && authHeader.split(" ")[1];
 
-    const auth = getAuth();
+    // const auth = getAuth();
 
-    await signInWithCustomToken(auth, token)
+    /* await signInWithCustomToken(auth, token)
       .then((user) => {
         if (user) {
           next();
@@ -30,7 +30,7 @@ const requireAuthFirebase = async (req, res, next) => {
           esito: false,
           message: "Utente non autenticato",
         });
-      });
+      }); */
   } catch (error) {
     console.log(error);
     res.status(401).json({
