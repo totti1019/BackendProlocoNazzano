@@ -49,12 +49,12 @@ const requireAuthFirebase = async (req, res, next) => {
       //const token = req.headers.authorization;
       //console.log("Token:", token);
       // Continua con la verifica del token o qualsiasi altra logica necessaria
+      next();
     } else {
       // Gestisci il caso in cui l'header "Authorization" non sia presente
       // Puoi inviare una risposta di errore o eseguire altre azioni necessarie
     }
     // Continua con il middleware successivo o la gestione della richiesta
-    next();
   } catch (error) {
     // Gestisci eventuali errori
     console.error(error);
