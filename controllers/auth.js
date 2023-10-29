@@ -83,6 +83,15 @@ const loginAnonymous = async (req, res) => {
   const { uid } = req.body;
 
   try {
+    // Caricamento dei dati dalle shared
+    const loadedSharedData = await utils.loadSharedData();
+    if (loadedSharedData) {
+      console.log("Precarico il percorso");
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+
     const auth = getAuth();
     if (uid === undefined || uid === "") {
       // E' la prima volta che mi registro quindi creo l'account anonimo in firebase
