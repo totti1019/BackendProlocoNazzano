@@ -50,9 +50,11 @@ app.use((req, res, next) => {
     "Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
   if (req.method === "OPTIONS") {
+    console.log("OPTIONS");
     // Rispondi alle richieste OPTIONS
     res.status(200).end();
   } else {
+    console.log("ALTRO: ", req.method);
     next();
   }
 });
