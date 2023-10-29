@@ -70,7 +70,6 @@ const requireAuthFirebase = async (req, res, next) => {
             message: "Utente non autenticato",
           });
         });
-      next();
     }
     // Continua con il middleware successivo o la gestione della richiesta
   } catch (error) {
