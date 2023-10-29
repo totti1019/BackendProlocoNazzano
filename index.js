@@ -49,11 +49,15 @@ app.use((req, res, next) => {
     "Access-Control-Expose-Headers",
     "Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
+  // Aggiungi un nuovo blocco per gestire le richieste OPTIONS
   if (req.method === "OPTIONS") {
-    console.log("OPTIONS");
-    // Rispondi alle richieste OPTIONS
+    // Rispondi alle richieste OPTIONS con i dettagli CORS appropriati
+    res.set("Access-Control-Allow-Origin", "https://fabiocola.altervista.org");
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
     res.status(200).end();
   } else {
+    // Altrimenti, gestisci le altre richieste come lo fai attualmente
     console.log("ALTRO: ", req.method);
     next();
   }
