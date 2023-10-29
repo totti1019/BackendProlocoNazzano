@@ -20,8 +20,8 @@ const PORT = process.env.PORT || 3000;
 
 // Configura l'app Express
 const app = express();
-// Impostazione del middleware per il parsing del corpo delle richieste come JSON
 app.use(express.json());
+
 const httpServer = http.createServer(app);
 
 // Configurazione del WebSocket con Socket.io
@@ -32,9 +32,8 @@ const io = new Server(httpServer, {
   },
 });
 
-// Configurazione delle impostazioni CORS con Express
+// Middleware per il CORS
 app.use(function (req, res, next) {
-  var oneof = false;
   res.header("Access-Control-Allow-Origin", "https://fabiocola.altervista.org");
 
   if (req.headers["access-control-request-method"]) {
@@ -42,22 +41,16 @@ app.use(function (req, res, next) {
       "Access-Control-Allow-Methods",
       req.headers["access-control-request-method"]
     );
-    oneof = true;
   }
   if (req.headers["access-control-request-headers"]) {
     res.header(
       "Access-Control-Allow-Headers",
       req.headers["access-control-request-headers"]
     );
-    oneof = true;
-  }
-  if (oneof) {
-    res.header("Access-Control-Max-Age", 60 * 60 * 24 * 365);
   }
 
-  // intercept OPTIONS method
-  if (oneof && req.method == "OPTIONS") {
-    res.send(200);
+  if (req.method == "OPTIONS") {
+    res.sendStatus(200); // Gestione delle richieste OPTIONS
   } else {
     next();
   }
