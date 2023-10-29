@@ -52,7 +52,6 @@ app.use((req, res, next) => {
   // Aggiungi un nuovo blocco per gestire le richieste OPTIONS
   if (req.method === "OPTIONS") {
     // Rispondi alle richieste OPTIONS con i dettagli CORS appropriati
-    res.set("Access-Control-Allow-Origin", "https://fabiocola.altervista.org");
     res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
     res.status(200).end();
