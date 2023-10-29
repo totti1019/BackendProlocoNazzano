@@ -36,10 +36,10 @@ const io = new Server(httpServer, {
 
 app.use(function (req, res, next) {
   var oneof = false;
-  if (req.headers.origin) {
+  /*if (req.headers.origin) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     oneof = true;
-  }
+  }*/
   if (req.headers["access-control-request-method"]) {
     res.header(
       "Access-Control-Allow-Methods",
