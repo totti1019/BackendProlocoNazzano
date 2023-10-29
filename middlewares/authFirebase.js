@@ -43,7 +43,8 @@ const { getAuth, signInWithCustomToken } = require("firebase/auth");
 const requireAuthFirebase = async (req, res, next) => {
   try {
     // Verifica se è una richiesta POST e se l'header "Authorization" è presente
-    console.error(req.method);
+    console.error("DOBYYYYYYYYYYY", req.body);
+    console.error("HEADER", req.method);
     if (req.method === "POST") {
       console.error(req.headers);
       //const token = req.headers.authorization;
