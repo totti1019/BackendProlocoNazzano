@@ -1,4 +1,4 @@
-const { verifyIdToken } = require("firebase/auth");
+const { getAuth, signInWithCustomToken } = require("firebase/auth");
 
 // Middleware per verificare l'autenticazione prima di consentire una chiamata API
 const requireAuthFirebase = async (req, res, next) => {
@@ -18,21 +18,22 @@ const requireAuthFirebase = async (req, res, next) => {
       });
     }
 
-    try {
-      const decodedToken = await verifyIdToken(auth, token);
-      // Il token è valido, e decodedToken contiene le informazioni sull'utente autenticato
+    const auth = getAuth();
+
+    const user = await signInWithCustomToken(auth, token);
+
+    if (user) {
       return next();
-    } catch (error) {
-      console.error(error);
+    } else {
       return res.status(401).json({
         code: res.statusCode,
         esito: false,
-        message: "Token non valido o scaduto",
+        message: "Utente non autenticato",
       });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
+    res.status(500).json({
       code: res.statusCode,
       esito: false,
       message: "Errore durante l'autenticazione",
