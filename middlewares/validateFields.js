@@ -11,13 +11,7 @@ const validateFields = async (req, res, next) => {
       .withMessage(localizable.emailNonValida),
     password: check("password")
       .isString()
-      .withMessage(localizable.passwordNonValida)
-      .isLength({ min: 8 })
-      .withMessage(localizable.passwordMinCaratteri)
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
-      )
-      .withMessage(localizable.passwordCaratteriSpeciali),
+      .withMessage(localizable.passwordNonValida),
     fullName: check("fullName")
       .notEmpty()
       .escape()

@@ -150,8 +150,6 @@ const loginAnonymous = async (req, res) => {
 
 // METODO PER IL LOGIN CON EMAIL E PASSWORD
 const login = async (req, res) => {
-  console.log("SONO QUII ");
-
   try {
     const { email, password } = req.body;
 
