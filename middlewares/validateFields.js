@@ -41,9 +41,14 @@ const validateFields = async (req, res, next) => {
   }
 
   // Verifica gli errori di convalida
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+  const result = validationResult(req);
+  if (result && result.errors.length > 0) {
+    const primoErrore = result.errors[0];
+    return res.status(400).json({
+      code: res.statusCode,
+      esito: false,
+      message: primoErrore.msg,
+    });
   }
 
   next();

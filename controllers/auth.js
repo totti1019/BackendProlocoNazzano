@@ -150,16 +150,7 @@ const loginAnonymous = async (req, res) => {
 
 // METODO PER IL LOGIN CON EMAIL E PASSWORD
 const login = async (req, res) => {
-  // Esegui la convalida
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      code: res.statusCode,
-      esito: false,
-      message: errors[0],
-    });
-  }
+  console.log("SONO QUII ");
 
   try {
     const { email, password } = req.body;
