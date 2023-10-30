@@ -4,7 +4,11 @@ const utils = require("./utils/utils");
 
 const { check, validationResult } = require("express-validator");
 
-const { getAuth, signInAnonymously, getIdToken } = require("firebase/auth");
+const {
+  getAuth,
+  signInAnonymously,
+  signInWithEmailAndPassword,
+} = require("firebase/auth");
 
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
@@ -137,7 +141,7 @@ const loginAnonymous = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      code: 500,
+      code: res.statusCode,
       esito: false,
       message: error.message || "Errore sconosciuto",
     });
@@ -150,31 +154,46 @@ const login = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res
-      .status(400)
-      .json({ code: res.statusCode, message: errors.array() });
-  }
-
-  const { email, password } = req.body;
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(404).json({
+    return res.status(400).json({
       code: res.statusCode,
-      message: localizable.utenteNonRegistrato,
+      esito: false,
+      message: errors.array(),
     });
   }
-  if (await bcrypt.compare(password, user.password)) {
-    const token = jwt.sign(
-      { id: user._id, username: user.email },
-      process.env.JWT_SECRET
+
+  try {
+    const { email, password } = req.body;
+
+    const auth = getAuth();
+
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
     );
-    return res.status(200).json({ code: res.statusCode, jwt: token });
+    const user = userCredential.user;
+
+    const customToken = await adminFirebase.auth().createCustomToken(user.uid);
+
+    const oggetto = {
+      uid: user.uid,
+      token: customToken,
+    };
+
+    return res.status(200).json({
+      code: res.statusCode,
+      esito: true,
+      response: oggetto,
+      message: "Login effettuato con successo",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: res.statusCode,
+      esito: false,
+      message: "Credenziali errate",
+    });
   }
-  return res.status(404).json({
-    code: res.statusCode,
-    message: localizable.emailPasswordErrata,
-  });
 };
 
 // METODO PER LA REGISTRAZIONE
