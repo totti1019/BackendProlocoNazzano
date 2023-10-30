@@ -157,7 +157,7 @@ const login = async (req, res) => {
     return res.status(400).json({
       code: res.statusCode,
       esito: false,
-      message: errors.array(),
+      message: errors[0],
     });
   }
 
