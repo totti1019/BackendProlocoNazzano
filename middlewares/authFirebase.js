@@ -1,6 +1,5 @@
 const { getAuth, signInWithCustomToken } = require("firebase/auth");
 
-// Middleware per verificare l'autenticazione prima di consentire una chiamata API
 const requireAuthFirebase = async (req, res, next) => {
   try {
     if (req.method !== "POST") {
@@ -8,11 +7,20 @@ const requireAuthFirebase = async (req, res, next) => {
     }
 
     const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!authHeader) {
+      return res.status(401).json({
+        code: 401,
+        esito: false,
+        message: "Token di autorizzazione mancante",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
-        code: res.statusCode,
+        code: 401,
         esito: false,
         message: "Token di autorizzazione mancante",
       });
@@ -20,21 +28,21 @@ const requireAuthFirebase = async (req, res, next) => {
 
     const auth = getAuth();
 
-    const user = await signInWithCustomToken(auth, token);
-
-    if (user) {
+    try {
+      await signInWithCustomToken(auth, token);
       return next();
-    } else {
+    } catch (error) {
+      console.error(error);
       return res.status(401).json({
-        code: res.statusCode,
+        code: 401,
         esito: false,
-        message: "Utente non autenticato",
+        message: "Token non valido",
       });
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      code: res.statusCode,
+      code: 500,
       esito: false,
       message: "Errore durante l'autenticazione",
     });

@@ -81,9 +81,8 @@ async function verifyGoogleToken(req, res, email, id, fullName) {
 
 // Autenticazione anonima
 const loginAnonymous = async (req, res) => {
-  const { uid } = req.body;
-
   try {
+    const { uid } = req.body;
     // Precarico i dati nel percorso
     const loadedSharedData = await utils.loadSharedData();
 
@@ -92,15 +91,14 @@ const loginAnonymous = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     }
 
-    const auth = getAuth();
-
     if (!uid) {
+      const auth = getAuth();
       const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
 
       if (!user) {
         return res.status(400).json({
-          code: res.statusCode,
+          code: 400,
           esito: false,
           message: "Utente non autenticato",
         });
@@ -137,8 +135,9 @@ const loginAnonymous = async (req, res) => {
       });
     }
   } catch (error) {
-    return res.status(400).json({
-      code: res.statusCode,
+    console.error(error);
+    return res.status(500).json({
+      code: 500,
       esito: false,
       message: error.message || "Errore sconosciuto",
     });
