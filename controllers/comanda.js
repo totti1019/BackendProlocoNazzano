@@ -288,7 +288,6 @@ const leggiIncasso = async (req, res) => {
             totaleComanda: comanda.totaleComanda,
             pagamento: comanda.pagamento,
           }));
-          console.log(incasso);
           res.status(200).json({
             code: res.statusCode,
             esito: true,
