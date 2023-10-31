@@ -24,6 +24,7 @@ const {
   adminFirebase,
   appFirebase,
 } = require("../controllers/utils/config-admin-firebase"); // Importa il modulo di configurazione firebase admin
+const { use } = require("../routers/users");
 
 // METODO PER IL LOGIN DI GOOGLE
 const loginGoogle = async (req, res) => {
@@ -161,8 +162,13 @@ const login = async (req, res) => {
       password
     );
     const user = userCredential.user;
+    const oneDayFromNow = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // Scadenza tra 24 ore
 
-    const customToken = await adminFirebase.auth().createCustomToken(user.uid);
+    const customToken = await adminFirebase
+      .auth()
+      .createCustomToken(user.uid, additionalClaims, {
+        expires: oneDayFromNow,
+      });
 
     const oggetto = {
       uid: user.uid,
