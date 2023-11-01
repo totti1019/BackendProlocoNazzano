@@ -325,6 +325,77 @@ const leggiIncasso = async (req, res) => {
   }
 };
 
+// Funzione per salvare la camanda nel database Firebase
+const leggiDati = async (req, res) => {
+  const jsonString = req.body;
+
+  try {
+    const sagra = "polenta2023";
+    percorsoDb = `prolocoNazzano/${sagra}/comande`;
+
+    if (!isValidJSON(jsonString)) {
+      throw new Error("JSON non valido");
+    }
+
+    // Creazione di un riferimento alla posizione specifica del database
+    const dataRef = ref(database, percorsoDb);
+    const comandaSnapshot = await get(dataRef); // Ottenere uno snapshot dei dati
+
+    if (comandaSnapshot.exists()) {
+      const comande = comandaSnapshot.val();
+      // Creiamo un oggetto per tenere traccia delle quantità dei piatti
+      const sommaPiattoQuantita = {};
+
+      // Scandiamo tutte le comande
+      comande.forEach((comanda) => {
+        const comandaItems = comanda.comanda; // Ottieni l'array dei piatti nella comanda
+        comandaItems.forEach((item) => {
+          const piatto = item.piatto;
+          const quantita = parseInt(item.quantita, 10); // Converto la quantità in un numero intero
+
+          // Aggiungiamo la quantità al piatto nella nostra mappa
+          if (sommaPiattoQuantita[piatto]) {
+            sommaPiattoQuantita[piatto] += quantita;
+          } else {
+            sommaPiattoQuantita[piatto] = quantita;
+          }
+        });
+      });
+
+      // Convertiamo l'oggetto in un array di oggetti con "piatto" e "quantità"
+      const piattiQuantitaArray = Object.keys(sommaPiattoQuantita).map(
+        (piatto) => ({
+          piatto,
+          quantita: sommaPiattoQuantita[piatto],
+        })
+      );
+
+      console.log(piattiQuantitaArray);
+
+      res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: piattiQuantitaArray,
+        message: `Dati trovati`,
+      });
+    } else {
+      console.log("Comande non trovate");
+      res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: null,
+        message: `Nessun dato`,
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      code: res.statusCode,
+      esito: false,
+      message: error.message || "Errore sconosciuto",
+    });
+  }
+};
+
 function isValidJSON(text) {
   try {
     if (Array.isArray(text)) {
@@ -345,4 +416,5 @@ module.exports = {
   leggiVecchiaComanda,
   updateVecchiaComanda,
   leggiIncasso,
+  leggiDati,
 };
