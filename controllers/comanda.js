@@ -337,12 +337,7 @@ const leggiDati = async (req, res) => {
     if (!jsonString.anno || !jsonString.sagra) {
       throw new Error("Parametri vuoti");
     }
-    if (jsonString.anno == "tutti" || jsonString.sagra == "tutte") {
-      percorsoDb = `prolocoNazzano`;
-    } else {
-      const sagra = `${jsonString.sagra}${jsonString.anno}`;
-      percorsoDb = `prolocoNazzano/${sagra}/comande`;
-    }
+    percorsoDb = `prolocoNazzano`;
 
     // Creazione di un riferimento alla posizione specifica del database
     const dataRef = ref(database, percorsoDb);
@@ -351,48 +346,23 @@ const leggiDati = async (req, res) => {
     if (comandaSnapshot.exists()) {
       const comande = comandaSnapshot.val();
 
-      let piattiQuantitaArray = [];
-      if (percorsoDb === "prolocoNazzano") {
-        piattiQuantitaArray = convertComandeToObject(comande, jsonString);
-      } else {
-        piattiQuantitaArray = convertComandeToObject(comande, jsonString);
-        console.log(piattiQuantitaArray);
-        // Creiamo un oggetto per tenere traccia delle quantità dei piatti
-        const sommaPiattoQuantita = {};
+      const piattiQuantitaArray = convertComandeToObject(comande, jsonString);
 
-        // Scandiamo tutte le comande
-        comande.forEach((comanda) => {
-          const comandaItems = comanda.comanda; // Ottieni l'array dei piatti nella comanda
-          comandaItems.forEach((item) => {
-            const piatto = item.piatto;
-            const quantita = parseInt(item.quantita, 10); // Converto la quantità in un numero intero
-
-            // Aggiungiamo la quantità al piatto nella nostra mappa
-            if (sommaPiattoQuantita[piatto]) {
-              sommaPiattoQuantita[piatto] += quantita;
-            } else {
-              sommaPiattoQuantita[piatto] = quantita;
-            }
-          });
+      if (piattiQuantitaArray.length > 0) {
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          response: piattiQuantitaArray,
+          message: `Dati trovati`,
         });
-
-        // Convertiamo l'oggetto in un array di oggetti con "piatto" e "quantità"
-        piattiQuantitaArray = Object.keys(sommaPiattoQuantita).map(
-          (piatto) => ({
-            piatto,
-            quantita: sommaPiattoQuantita[piatto],
-          })
-        );
-
-        console.log(piattiQuantitaArray);
+      } else {
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          response: piattiQuantitaArray,
+          message: `Nessun dato trovato`,
+        });
       }
-
-      res.status(200).json({
-        code: res.statusCode,
-        esito: true,
-        response: piattiQuantitaArray,
-        message: `Dati trovati`,
-      });
     } else {
       console.log("Comande non trovate");
       res.status(200).json({
