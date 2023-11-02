@@ -330,11 +330,18 @@ const leggiDati = async (req, res) => {
   const jsonString = req.body;
 
   try {
-    const sagra = "polenta2023";
-    percorsoDb = `prolocoNazzano/${sagra}/comande`;
-
     if (!isValidJSON(jsonString)) {
       throw new Error("JSON non valido");
+    }
+
+    if (!jsonString.anno || !jsonString.sagra) {
+      throw new Error("Parametri vuoti");
+    }
+    if (jsonString.anno == "tutti" || jsonString.sagra == "tutte") {
+      percorsoDb = `prolocoNazzano`;
+    } else {
+      const sagra = `${jsonString.sagra}${jsonString.anno}`;
+      percorsoDb = `prolocoNazzano/${sagra}/comande`;
     }
 
     // Creazione di un riferimento alla posizione specifica del database
@@ -343,34 +350,42 @@ const leggiDati = async (req, res) => {
 
     if (comandaSnapshot.exists()) {
       const comande = comandaSnapshot.val();
-      // Creiamo un oggetto per tenere traccia delle quantità dei piatti
-      const sommaPiattoQuantita = {};
 
-      // Scandiamo tutte le comande
-      comande.forEach((comanda) => {
-        const comandaItems = comanda.comanda; // Ottieni l'array dei piatti nella comanda
-        comandaItems.forEach((item) => {
-          const piatto = item.piatto;
-          const quantita = parseInt(item.quantita, 10); // Converto la quantità in un numero intero
+      let piattiQuantitaArray = [];
+      if (percorsoDb === "prolocoNazzano") {
+        piattiQuantitaArray = convertComandeToObject(comande, jsonString);
+      } else {
+        piattiQuantitaArray = convertComandeToObject(comande, jsonString);
+        console.log(piattiQuantitaArray);
+        // Creiamo un oggetto per tenere traccia delle quantità dei piatti
+        const sommaPiattoQuantita = {};
 
-          // Aggiungiamo la quantità al piatto nella nostra mappa
-          if (sommaPiattoQuantita[piatto]) {
-            sommaPiattoQuantita[piatto] += quantita;
-          } else {
-            sommaPiattoQuantita[piatto] = quantita;
-          }
+        // Scandiamo tutte le comande
+        comande.forEach((comanda) => {
+          const comandaItems = comanda.comanda; // Ottieni l'array dei piatti nella comanda
+          comandaItems.forEach((item) => {
+            const piatto = item.piatto;
+            const quantita = parseInt(item.quantita, 10); // Converto la quantità in un numero intero
+
+            // Aggiungiamo la quantità al piatto nella nostra mappa
+            if (sommaPiattoQuantita[piatto]) {
+              sommaPiattoQuantita[piatto] += quantita;
+            } else {
+              sommaPiattoQuantita[piatto] = quantita;
+            }
+          });
         });
-      });
 
-      // Convertiamo l'oggetto in un array di oggetti con "piatto" e "quantità"
-      const piattiQuantitaArray = Object.keys(sommaPiattoQuantita).map(
-        (piatto) => ({
-          piatto,
-          quantita: sommaPiattoQuantita[piatto],
-        })
-      );
+        // Convertiamo l'oggetto in un array di oggetti con "piatto" e "quantità"
+        piattiQuantitaArray = Object.keys(sommaPiattoQuantita).map(
+          (piatto) => ({
+            piatto,
+            quantita: sommaPiattoQuantita[piatto],
+          })
+        );
 
-      console.log(piattiQuantitaArray);
+        console.log(piattiQuantitaArray);
+      }
 
       res.status(200).json({
         code: res.statusCode,
@@ -382,7 +397,7 @@ const leggiDati = async (req, res) => {
       console.log("Comande non trovate");
       res.status(200).json({
         code: res.statusCode,
-        esito: true,
+        esito: false,
         response: null,
         message: `Nessun dato`,
       });
@@ -395,6 +410,76 @@ const leggiDati = async (req, res) => {
     });
   }
 };
+
+function convertComandeToObject(data, filter) {
+  const result = [];
+
+  const { anno, sagra } = filter;
+
+  for (const sagraKey in data) {
+    if (data.hasOwnProperty(sagraKey)) {
+      if (
+        (anno === "tutti" || sagraKey.endsWith(anno)) &&
+        (sagra === "tutte" || sagraKey.startsWith(sagra)) &&
+        data[sagraKey].comande
+      ) {
+        const sagraData = data[sagraKey];
+        const comande = sagraData.comande;
+        const piattiQuantitaArray = [];
+
+        comande.forEach((comanda) => {
+          comanda.comanda.forEach((item) => {
+            const piatto = item.piatto;
+            const quantita = parseInt(item.quantita, 10);
+
+            const existingPiatto = piattiQuantitaArray.find(
+              (p) => p.piatto === piatto
+            );
+            if (existingPiatto) {
+              existingPiatto.quantita += quantita;
+            } else {
+              piattiQuantitaArray.push({ piatto, quantita });
+            }
+          });
+        });
+
+        const sagraEntry = {
+          nomeSagra: sagraKey,
+          totaleComande: piattiQuantitaArray,
+        };
+
+        result.push(sagraEntry);
+      }
+    }
+  }
+  console.log("result", result);
+  return result;
+}
+
+/*function getFiltriTutti(sagre) {
+  const comande2023 = Object.entries(sagre)
+    .filter(([key, value]) => key.endsWith("2023") && value.comande)
+    .map(([key, value]) => value.comande)
+    .flat();
+
+  return convertToSagreObject(comande2023);
+}
+
+function convertToSagreObject(comandeArray) {
+  const sagreObject = {};
+  comandeArray.forEach((comanda) => {
+    const nomeSagra = comanda.sagra;
+    const piattiQuantita = comanda.comande;
+
+    if (!sagreObject[nomeSagra]) {
+      sagreObject[nomeSagra] = [];
+    }
+
+    sagreObject[nomeSagra].push(...piattiQuantita);
+  });
+
+  return sagreObject;
+} */
 
 function isValidJSON(text) {
   try {
