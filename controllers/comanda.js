@@ -349,6 +349,19 @@ const leggiDati = async (req, res) => {
       const piattiQuantitaArray = convertComandeToObject(comande, jsonString);
 
       if (piattiQuantitaArray.length > 0) {
+        piattiQuantitaArray.sort((a, b) => {
+          const yearA = parseInt(a.nomeSagra.slice(-4), 10);
+          const yearB = parseInt(b.nomeSagra.slice(-4), 10);
+          const nameA = a.nomeSagra;
+          const nameB = b.nomeSagra;
+
+          if (yearA !== yearB) {
+            return yearB - yearA; // Ordina per anno (dal più recente al più vecchio)
+          }
+
+          // Se gli anni sono gli stessi, ordina per nome
+          return nameA.localeCompare(nameB);
+        });
         res.status(200).json({
           code: res.statusCode,
           esito: true,
