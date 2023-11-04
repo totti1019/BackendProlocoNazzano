@@ -73,9 +73,14 @@ const saveNumber = async (req, res) => {
     }
     // Controllo che il json sia valido
     if (isValidJSON(jsonString)) {
+      const { numeroProgressivo, tempoMedioServizio } = jsonString;
       const dataRef = ref(database, percorsoDb);
       // Utilizza il metodo 'set' per sovrascrivere i dati nel percorso specificato
-      set(dataRef, jsonString)
+      const oggetto = {
+        numero: numeroProgressivo,
+        tempoMedioServizio: tempoMedioServizio,
+      };
+      set(dataRef, oggetto)
         .then(() => {
           res.status(200).json({
             code: res.statusCode,
