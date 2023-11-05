@@ -49,6 +49,7 @@ const updateNumeroComanda = async (req, res) => {
         code: res.statusCode,
         esito: true,
         response: { numeroComanda: newNumeroComanda },
+        message: "Aggiornato con successo",
       });
     } else {
       const error = result.error;
@@ -56,12 +57,14 @@ const updateNumeroComanda = async (req, res) => {
         res.status(409).json({
           code: res.statusCode,
           esito: false,
+          response: null,
           message: "Comanda già esistente",
         });
       } else {
         res.status(500).json({
           code: res.statusCode,
           esito: false,
+          response: null,
           message: "Aggiornamento non riuscito",
         });
       }
@@ -73,6 +76,7 @@ const updateNumeroComanda = async (req, res) => {
     res.status(500).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: "Errore durante l'aggiornamento del numero di comanda",
     });
   }
@@ -81,8 +85,11 @@ const updateNumeroComanda = async (req, res) => {
 // Funzione per salvare la camanda nel database Firebase
 const saveComanda = async (req, res) => {
   const NUMERO_COMANDA_OFFSET = 1;
-  const jsonString = req.body;
+  console.log("SONO QUIII");
+
   try {
+    const { numeroComanda, comanda, pagamento, totaleComanda, numeroCassa } =
+      req.body;
     // Caricamento dei dati dalle shared
     const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
@@ -92,35 +99,26 @@ const saveComanda = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     }
 
-    if (!isValidJSON(jsonString)) {
-      throw new Error("JSON non valido");
-    }
-
-    if (!jsonString.numeroComanda || jsonString.numeroComanda <= 0) {
-      throw new Error("Il campo 'numeroComanda' non è valido");
-    }
-
     const dataRef = ref(database, percorsoDb);
-    const newNumeroComanda = jsonString.numeroComanda;
 
     const oggetto = {
-      numeroComanda: newNumeroComanda,
-      comanda: jsonString.comanda,
-      pagamento: jsonString.pagamento,
-      totaleComanda: jsonString.totaleComanda,
-      numeroCassa: jsonString.numeroCassa,
+      numeroComanda: numeroComanda,
+      comanda: comanda,
+      pagamento: pagamento,
+      totaleComanda: totaleComanda,
+      numeroCassa: numeroCassa,
     };
 
     const updates = {};
-    updates[newNumeroComanda - NUMERO_COMANDA_OFFSET] = oggetto;
+    updates[numeroComanda - NUMERO_COMANDA_OFFSET] = oggetto;
 
     await update(dataRef, updates);
 
     res.status(200).json({
       code: res.statusCode,
       esito: true,
-      response: { numeroComanda: newNumeroComanda },
-      message: `Comanda numero ${newNumeroComanda} salvata correttamente`,
+      response: { numeroComanda: numeroComanda },
+      message: `Comanda numero ${numeroComanda} salvata correttamente`,
     });
   } catch (error) {
     res.status(400).json({

@@ -9,10 +9,15 @@ const {
   leggiDati,
 } = require("../controllers/comanda");
 
+const {
+  validateAllComanda,
+  handleValidationErrors,
+} = require("../middlewares/validateComandaFields");
+
 const router = express.Router();
 
 router.post("/", updateNumeroComanda);
-router.post("/save", saveComanda);
+router.post("/save", [validateAllComanda, handleValidationErrors], saveComanda);
 router.post("/leggiVecchiaComanda", leggiVecchiaComanda);
 router.post("/updateVecchiaComanda", updateVecchiaComanda);
 router.post("/leggiIncasso", leggiIncasso);

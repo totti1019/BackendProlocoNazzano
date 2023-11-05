@@ -6,7 +6,7 @@ const validateFields = async (req, res, next) => {
   const validationRules = {
     email: check("email")
       .notEmpty()
-      .escape()
+      .escape() // Serve per pulire i dati http
       .isEmail()
       .withMessage(localizable.emailNonValida),
     password: check("password")
@@ -14,7 +14,7 @@ const validateFields = async (req, res, next) => {
       .withMessage(localizable.passwordNonValida),
     fullName: check("fullName")
       .notEmpty()
-      .escape()
+      .escape() // Serve per pulire i dati http
       .withMessage(localizable.nominativoMancante)
       .isString()
       .withMessage(localizable.nominativoNonValido),
@@ -24,7 +24,6 @@ const validateFields = async (req, res, next) => {
       .isString()
       .withMessage(localizable.passwordNonValida),
     uid: check("uid").isString().withMessage(localizable.uidNonValido),
-    // Aggiungi altre regole di convalida per gli altri campi
   };
 
   // Esegui la convalida solo per i campi presenti nei dati
@@ -41,6 +40,7 @@ const validateFields = async (req, res, next) => {
     return res.status(400).json({
       code: res.statusCode,
       esito: false,
+      respose: null,
       message: primoErrore.msg,
     });
   }
