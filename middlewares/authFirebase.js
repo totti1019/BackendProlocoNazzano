@@ -1,4 +1,5 @@
 const { getAuth, signInWithCustomToken } = require("firebase/auth");
+const { auth } = require("firebase-admin"); // Assicurati di importare la libreria Firebase Admin
 
 const requireAuthFirebase = async (req, res, next) => {
   try {
@@ -75,7 +76,7 @@ const validationToken = async (req, res, next) => {
       });
     }
 
-    const auth = getAuth();
+    /*const auth = getAuth();
 
     try {
       await signInWithCustomToken(auth, token);
@@ -91,6 +92,25 @@ const validationToken = async (req, res, next) => {
         esito: false,
         message: "Token non valido",
       });
+    }*/
+    // Esempio di utilizzo:
+    const decodedToken = await verifyFirebaseToken(token);
+
+    if (decodedToken) {
+      // Il token è valido e non è scaduto
+      return res.status(200).json({
+        code: 200,
+        esito: true,
+        message: "Token valido",
+      });
+    } else {
+      // Il token non è valido o è scaduto
+      console.log("Token non valido o scaduto");
+      return res.status(401).json({
+        code: 401,
+        esito: false,
+        message: "Token non valido o scaduto",
+      });
     }
   } catch (error) {
     console.error(error);
@@ -99,6 +119,16 @@ const validationToken = async (req, res, next) => {
       esito: false,
       message: "Errore durante l'autenticazione",
     });
+  }
+};
+
+const verifyFirebaseToken = async (token) => {
+  try {
+    const decodedToken = await auth().verifyIdToken(token);
+    return decodedToken;
+  } catch (error) {
+    // Se la verifica del token fallisce, il token non è valido o è scaduto
+    return null;
   }
 };
 

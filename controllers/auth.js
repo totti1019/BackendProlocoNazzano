@@ -162,18 +162,22 @@ const login = async (req, res) => {
       password
     );
     const user = userCredential.user;
-    const oneDayFromNow = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // Scadenza tra 24 ore
+
+    /* const oneDayFromNow = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // Scadenza tra 24 ore
     const additionalClaims = {
       expires: oneDayFromNow, // Aggiungi il claim "expires" con l'orario di scadenza
     };
 
-    const customToken = await adminFirebase
+     const customToken = await adminFirebase
       .auth()
-      .createCustomToken(user.uid, additionalClaims);
+      .createCustomToken(user.uid, additionalClaims); */
+
+    // Ottenere il token ID
+    const idToken = await user.getIdToken();
 
     const oggetto = {
       uid: user.uid,
-      token: customToken,
+      token: idToken,
     };
 
     return res.status(200).json({
