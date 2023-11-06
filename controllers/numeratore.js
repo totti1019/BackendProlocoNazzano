@@ -127,12 +127,17 @@ const deleteNumber = async (req, res) => {
     }
     const dataRef = ref(database, percorsoDb);
     // Utilizza il metodo 'remove' per eliminare il nodo specificato
+    const oggetto = {
+      numero: 0,
+      tempoMedioServizio: [],
+    };
     remove(dataRef)
       .then(() => {
         res.status(200).json({
           code: res.statusCode,
           esito: true,
-          response: "Numero eliminato con successo",
+          response: oggetto,
+          message: "Numero eliminato con successo",
         });
       })
       .catch((error) => {
@@ -140,6 +145,7 @@ const deleteNumber = async (req, res) => {
         res.status(500).json({
           code: res.statusCode,
           esito: false,
+          response: null,
           message: "Numero non eliminato",
         });
       });
@@ -148,6 +154,7 @@ const deleteNumber = async (req, res) => {
     res.status(500).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: "Numero non eliminato",
     });
   }
