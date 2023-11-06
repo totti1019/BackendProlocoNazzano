@@ -1,8 +1,9 @@
 const { check, validationResult } = require("express-validator");
-const localizable = require("../locales/localizables");
+const localizable = require("../../locales/localizables");
 
 // Middleware di convalida che combina tutte le convalide
-const validateAllComanda = [
+const validateComandaField = [
+  // SALVA COMANDA
   check("numeroComanda")
     .custom((value) => {
       if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
@@ -18,7 +19,7 @@ const validateAllComanda = [
     .isArray()
     .withMessage(localizable.comandaNonValida)
     .custom((value) => {
-      if (value.length === 0) {
+      if (!value || value.length === 0) {
         throw new Error(localizable.comandaNonValidaVuota);
       }
       return true;
@@ -37,7 +38,12 @@ const validateAllComanda = [
     .withMessage(localizable.comandaTotaleComandaNonValida),
   check("numeroCassa")
     .custom((value) => {
-      if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
+      if (
+        !value ||
+        typeof value !== "number" ||
+        !Number.isInteger(value) ||
+        value <= 0
+      ) {
         throw new Error(localizable.comandaNumeroCassaNonValida);
       }
       return true;
@@ -58,7 +64,11 @@ const validateAllComanda = [
     .withMessage(localizable.comandaPrezzoNonValido),
   check("comanda.*.quantita")
     .custom((value) => {
-      if (typeof value !== "number" || !Number.isInteger(value)) {
+      if (
+        (!value && value !== 0) ||
+        typeof value !== "number" ||
+        !Number.isInteger(value)
+      ) {
         throw new Error(localizable.comandaQuantitaNonValida);
       }
       return true;
@@ -71,14 +81,11 @@ const validateAllComanda = [
 
 // Middleware finale per gestire gli errori di convalida
 const handleValidationErrors = (req, res, next) => {
-  console.log(req.body);
   const result = validationResult(req);
   if (result.errors.length > 0) {
     const lastError = result.errors[result.errors.length - 1];
-    console.log(result.errors);
     let value = lastError.value;
     if (value === undefined) {
-      console.log(result.errors);
       value = "Controlla la chiave";
     } else if (value === "") {
       value = "Campo vuoto";
@@ -96,6 +103,6 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 module.exports = {
-  validateAllComanda,
+  validateComandaField,
   handleValidationErrors,
 };

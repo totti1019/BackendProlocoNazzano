@@ -35,7 +35,7 @@ const updateNumeroComanda = async (req, res) => {
         currentData = [];
       }
 
-      // Calcola il nuovo numeroComanda
+      // Calcola il nuovo numeroComanda prendendo l'array comande e aggiunge +1
       const newNumeroComanda = currentData.length + 1;
 
       // Aggiungi il nuovo oggetto all'array
@@ -85,8 +85,6 @@ const updateNumeroComanda = async (req, res) => {
 // Funzione per salvare la camanda nel database Firebase
 const saveComanda = async (req, res) => {
   const NUMERO_COMANDA_OFFSET = 1;
-  console.log("SONO QUIII");
-
   try {
     const { numeroComanda, comanda, pagamento, totaleComanda, numeroCassa } =
       req.body;
@@ -124,6 +122,7 @@ const saveComanda = async (req, res) => {
     res.status(400).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: error.message || "Errore sconosciuto",
     });
   }
@@ -132,9 +131,10 @@ const saveComanda = async (req, res) => {
 // Funzione per salvare la camanda nel database Firebase
 const leggiVecchiaComanda = async (req, res) => {
   const NUMERO_COMANDA_OFFSET = 1;
-  const jsonString = req.body;
 
   try {
+    const { numeroVecchiaComanda } = req.body;
+
     // Caricamento dei dati dalle shared
     const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
@@ -144,26 +144,14 @@ const leggiVecchiaComanda = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     }
 
-    if (!isValidJSON(jsonString)) {
-      throw new Error("JSON non valido");
-    }
-
-    if (
-      !jsonString.numeroVecchiaComanda ||
-      jsonString.numeroVecchiaComanda <= 0
-    ) {
-      throw new Error("Il campo 'numeroVecchiaComanda' non è valido");
-    }
-
     // Creazione di un riferimento alla posizione specifica del database
     const dataRef = ref(database, percorsoDb);
-
-    const numeroVecchiaComanda = (
-      jsonString.numeroVecchiaComanda - NUMERO_COMANDA_OFFSET
+    const vecchiaComanda = (
+      numeroVecchiaComanda - NUMERO_COMANDA_OFFSET
     ).toString();
 
     // Esegui la query per cercare la comanda
-    const comandaSnapshot = await get(child(dataRef, numeroVecchiaComanda));
+    const comandaSnapshot = await get(child(dataRef, vecchiaComanda));
 
     if (comandaSnapshot.exists()) {
       const comanda = comandaSnapshot.val();
@@ -171,7 +159,7 @@ const leggiVecchiaComanda = async (req, res) => {
         code: res.statusCode,
         esito: true,
         response: comanda,
-        message: `Comanda numero ${jsonString.numeroVecchiaComanda} caricata correttamente`,
+        message: `Comanda numero ${numeroVecchiaComanda} caricata correttamente`,
       });
     } else {
       console.log("Comanda non trovata");
@@ -179,13 +167,14 @@ const leggiVecchiaComanda = async (req, res) => {
         code: res.statusCode,
         esito: true,
         response: null,
-        message: `Comanda numero ${jsonString.numeroVecchiaComanda} non trovata`,
+        message: `Comanda numero ${numeroVecchiaComanda} non trovata`,
       });
     }
   } catch (error) {
     res.status(400).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: error.message || "Errore sconosciuto",
     });
   }
@@ -194,9 +183,10 @@ const leggiVecchiaComanda = async (req, res) => {
 // Funzione per salvare la camanda nel database Firebase
 const updateVecchiaComanda = async (req, res) => {
   const NUMERO_COMANDA_OFFSET = 1;
-  const jsonString = req.body;
 
   try {
+    const { numeroComanda, comanda, pagamento, totaleComanda, numeroCassa } =
+      req.body;
     // Caricamento dei dati dalle shared
     const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
@@ -206,41 +196,32 @@ const updateVecchiaComanda = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     }
 
-    if (!isValidJSON(jsonString)) {
-      throw new Error("JSON non valido");
-    }
-
-    if (!jsonString.numeroComanda || jsonString.numeroComanda <= 0) {
-      throw new Error("Il campo 'numeroComanda' non è valido");
-    }
-
     const dataRef = ref(database, percorsoDb);
 
-    const newNumeroComanda = jsonString.numeroComanda;
-
     const oggetto = {
-      numeroComanda: newNumeroComanda,
-      comanda: jsonString.comanda,
-      pagamento: jsonString.pagamento,
-      totaleComanda: jsonString.totaleComanda,
-      numeroCassa: jsonString.numeroCassa,
+      numeroComanda: numeroComanda,
+      comanda: comanda,
+      pagamento: pagamento,
+      totaleComanda: totaleComanda,
+      numeroCassa: numeroCassa,
     };
 
     const updates = {};
-    updates[newNumeroComanda - NUMERO_COMANDA_OFFSET] = oggetto;
+    updates[numeroComanda - NUMERO_COMANDA_OFFSET] = oggetto;
 
     await update(dataRef, updates);
 
     res.status(200).json({
       code: res.statusCode,
       esito: true,
-      response: { numeroComanda: newNumeroComanda },
-      message: `Comanda numero ${newNumeroComanda} aggiornata correttamente`,
+      response: { numeroComanda: numeroComanda },
+      message: `Comanda numero ${numeroComanda} aggiornata correttamente`,
     });
   } catch (error) {
     res.status(400).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: error.message || "Errore sconosciuto",
     });
   }
@@ -248,59 +229,42 @@ const updateVecchiaComanda = async (req, res) => {
 
 // Funzione per salvare la camanda nel database Firebase
 const leggiIncasso = async (req, res) => {
-  const jsonString = req.body;
-
   try {
-    if (!isValidJSON(jsonString)) {
-      throw new Error("JSON non valido");
-    }
-
-    if (!jsonString.numeroCassa || jsonString.numeroCassa <= 0) {
-      throw new Error("Il campo 'numeroCassa' non è valido");
-    }
-
-    const numeroCassaDesiderato = jsonString.numeroCassa; // Numero di cassa desiderato
-
+    const { numeroCassa } = req.body;
     // Carica i dati delle comande da Firebase
     const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
-      const percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/comande`;
+    } else {
+      console.log("Impossibile caricare i dati.");
+      throw new Error("Impossibile caricare i dati.");
+    }
+    // Crea un riferimento alla posizione delle comande nel database Firebase
+    const dataRef = ref(database, percorsoDb);
 
-      // Crea un riferimento alla posizione delle comande nel database Firebase
-      const dataRef = ref(database, percorsoDb);
+    // Ottieni uno snapshot di tutte le comande
+    const comandeSnapshot = await get(dataRef);
 
-      // Ottieni uno snapshot di tutte le comande
-      const comandeSnapshot = await get(dataRef);
+    if (comandeSnapshot.exists()) {
+      const comandeData = comandeSnapshot.val();
 
-      if (comandeSnapshot.exists()) {
-        const comandeData = comandeSnapshot.val();
+      // Filtra le comande con il numero di cassa desiderato
+      const comandeFiltrate = comandeData.filter(
+        (comanda) => comanda.numeroCassa === numeroCassa
+      );
 
-        // Filtra le comande con il numero di cassa desiderato
-        const comandeFiltrate = comandeData.filter(
-          (comanda) => comanda.numeroCassa === numeroCassaDesiderato
-        );
-
-        if (comandeFiltrate.length > 0) {
-          // Estrai il totale e il metodo di pagamento di ciascuna comanda
-          const incasso = comandeFiltrate.map((comanda) => ({
-            totaleComanda: comanda.totaleComanda,
-            pagamento: comanda.pagamento,
-          }));
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: incasso,
-            message: "Elenco degli incassi scaricato correttamente",
-          });
-        } else {
-          console.log("Ancora nessun incasso");
-          res.status(200).json({
-            code: res.statusCode,
-            esito: true,
-            response: [],
-            message: "Ancora nessun incasso",
-          });
-        }
+      if (comandeFiltrate.length > 0) {
+        // Estrai il totale e il metodo di pagamento di ciascuna comanda
+        const incasso = comandeFiltrate.map((comanda) => ({
+          totaleComanda: comanda.totaleComanda,
+          pagamento: comanda.pagamento,
+        }));
+        res.status(200).json({
+          code: res.statusCode,
+          esito: true,
+          response: incasso,
+          message: "Elenco degli incassi scaricato correttamente",
+        });
       } else {
         console.log("Ancora nessun incasso");
         res.status(200).json({
@@ -311,13 +275,19 @@ const leggiIncasso = async (req, res) => {
         });
       }
     } else {
-      console.log("Impossibile caricare i dati.");
-      throw new Error("Impossibile caricare i dati.");
+      console.log("Ancora nessun incasso");
+      res.status(200).json({
+        code: res.statusCode,
+        esito: true,
+        response: [],
+        message: "Ancora nessun incasso",
+      });
     }
   } catch (error) {
     res.status(400).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: error.message || "Errore sconosciuto",
     });
   }
@@ -325,16 +295,9 @@ const leggiIncasso = async (req, res) => {
 
 // Funzione per salvare la camanda nel database Firebase
 const leggiDati = async (req, res) => {
-  const jsonString = req.body;
-
   try {
-    if (!isValidJSON(jsonString)) {
-      throw new Error("JSON non valido");
-    }
+    const { anno, sagra } = req.body;
 
-    if (!jsonString.anno || !jsonString.sagra) {
-      throw new Error("Parametri vuoti");
-    }
     percorsoDb = `prolocoNazzano`;
 
     // Creazione di un riferimento alla posizione specifica del database
@@ -344,7 +307,7 @@ const leggiDati = async (req, res) => {
     if (comandaSnapshot.exists()) {
       const comande = comandaSnapshot.val();
 
-      const piattiQuantitaArray = convertComandeToObject(comande, jsonString);
+      const piattiQuantitaArray = convertComandeToObject(comande, anno, sagra);
 
       if (piattiQuantitaArray.length > 0) {
         piattiQuantitaArray.sort((a, b) => {
@@ -387,15 +350,14 @@ const leggiDati = async (req, res) => {
     res.status(400).json({
       code: res.statusCode,
       esito: false,
+      response: null,
       message: error.message || "Errore sconosciuto",
     });
   }
 };
 
-function convertComandeToObject(data, filter) {
+function convertComandeToObject(data, anno, sagra) {
   const result = [];
-
-  const { anno, sagra } = filter;
 
   for (const sagraKey in data) {
     if (data.hasOwnProperty(sagraKey)) {
@@ -433,47 +395,7 @@ function convertComandeToObject(data, filter) {
       }
     }
   }
-  console.log("result", result);
   return result;
-}
-
-/*function getFiltriTutti(sagre) {
-  const comande2023 = Object.entries(sagre)
-    .filter(([key, value]) => key.endsWith("2023") && value.comande)
-    .map(([key, value]) => value.comande)
-    .flat();
-
-  return convertToSagreObject(comande2023);
-}
-
-function convertToSagreObject(comandeArray) {
-  const sagreObject = {};
-  comandeArray.forEach((comanda) => {
-    const nomeSagra = comanda.sagra;
-    const piattiQuantita = comanda.comande;
-
-    if (!sagreObject[nomeSagra]) {
-      sagreObject[nomeSagra] = [];
-    }
-
-    sagreObject[nomeSagra].push(...piattiQuantita);
-  });
-
-  return sagreObject;
-} */
-
-function isValidJSON(text) {
-  try {
-    if (Array.isArray(text)) {
-      return true; // È un array
-    }
-    if (typeof text === "object" && text !== null) {
-      return true; // È un oggetto
-    }
-  } catch (error) {
-    //console.log(error);
-    return false;
-  }
 }
 
 module.exports = {

@@ -23,6 +23,14 @@ const localizable = {
   comandaPagamentoNonValida: "Il parametro pagamento non è valido",
   comandaTotaleComandaNonValida: "Il parametro totale comanda non è valido",
   comandaNumeroCassaNonValida: "Il parametro numero cassa non è valido",
+  // Vecchia comanda
+  comandaNumeroVecchiaComandaNonValida:
+    "Il parametro numero vecchia comanda non è valido",
+  // Incasso Comande
+  comandaNumeroIncassoNonValida: "Il parametro numero cassa non è valido",
+  // Dati comande
+  comandaAnnoNonValido: "Il parametro anno non è valido",
+  comandaSagraNonValida: "Il parametro sagra non è valido",
 };
 
 module.exports = localizable;
