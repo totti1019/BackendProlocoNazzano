@@ -22,12 +22,21 @@ let percorsoDb = ``;
 const getAllMenu = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = await utils.loadSharedData();
+    /* const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
     } else {
       console.log("Impossibile caricare i dati.");
       throw new Error("Impossibile caricare i dati.");
+    } */
+
+    const loadedSharedData = utils.loadSharedData();
+
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+    } else {
+      console.log("Impossibile caricare i dati dalle shared data.");
+      throw new Error("Impossibile caricare i dati dalle shared data.");
     }
 
     const dataRef = ref(database, percorsoDb);
@@ -85,17 +94,17 @@ const saveMenu = async (req, res) => {
       };
 
       // Utilizzo del metodo per salvare un valore
-      utils
+      /* utils
         .savePercorsoSagraSQLite(jsonString.sagra)
         .then(() => {
           console.error("Dati salvati con successo");
         })
         .catch((error) => {
           console.error("Errore:", error);
-        });
+        }); */
 
       // Salvataggio dei dati nelle shared
-      //  utils.saveSharedData(sharedData);
+      utils.saveSharedData(sharedData);
 
       const percorso = `prolocoNazzano/${jsonString.sagra}/menu`;
 

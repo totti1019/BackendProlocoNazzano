@@ -26,7 +26,6 @@ const database = getDatabase(app);
 
 // Percorso assoluto del file
 const filePath = path.join(__dirname, "sharedData.json");
-console.error("PERCORSO DB filePath ", filePath);
 // Funzione per il salvataggio dei dati in un file
 function saveSharedData(data) {
   const dataToSave = JSON.stringify(data);
@@ -35,7 +34,6 @@ function saveSharedData(data) {
 
 function loadSharedData() {
   const loadedData = fs.readFileSync(filePath, "utf8");
-  console.error("PERCORSO DB ", loadedData);
   return JSON.parse(loadedData);
 }
 

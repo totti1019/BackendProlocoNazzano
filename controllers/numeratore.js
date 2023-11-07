@@ -20,7 +20,7 @@ const getNumber = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     } */
 
-    await utils
+    /* await utils
       .getPercorsoSagraSQLite()
       .then((percorsoSagra) => {
         console.error("Percorso Sagra:", percorsoSagra);
@@ -29,7 +29,16 @@ const getNumber = async (req, res) => {
       .catch((error) => {
         console.error("Errore:", error);
         throw new Error("Impossibile caricare i dati dal db locale");
-      });
+      }); */
+
+    const loadedSharedData = utils.loadSharedData();
+
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+    } else {
+      console.log("Impossibile caricare i dati dalle shared data.");
+      throw new Error("Impossibile caricare i dati dalle shared data.");
+    }
 
     const dataRef = ref(database, percorsoDb);
 
@@ -83,7 +92,7 @@ const saveNumber = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     } */
     // Utilizzo del metodo per ottenere il percorso della sagra
-    await utils
+    /* await utils
       .getPercorsoSagraSQLite()
       .then((percorsoSagra) => {
         console.error("Percorso Sagra:", percorsoSagra);
@@ -92,7 +101,16 @@ const saveNumber = async (req, res) => {
       .catch((error) => {
         console.error("Errore:", error);
         throw new Error("Impossibile caricare i dati dal db locale");
-      });
+      }); */
+
+    const loadedSharedData = utils.loadSharedData();
+
+    if (loadedSharedData) {
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+    } else {
+      console.log("Impossibile caricare i dati dalle shared data.");
+      throw new Error("Impossibile caricare i dati dalle shared data.");
+    }
 
     // Controllo che il json sia valido
     if (isValidJSON(jsonString)) {
