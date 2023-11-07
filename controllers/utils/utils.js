@@ -30,8 +30,14 @@ function saveSharedData(data) {
   fs.writeFileSync(filePath, dataToSave);
 }
 
+function loadSharedData() {
+  const loadedData = fs.readFileSync(filePath, "utf8");
+  console.error("PERCORSO DB", loadedData);
+  return JSON.parse(loadedData);
+}
+
 // Funzione per il caricamento dei dati da un file
-async function loadSharedData(req, res) {
+async function loadSharedData2(req, res) {
   try {
     const loadedData = fs.readFileSync(filePath, "utf8");
     return JSON.parse(loadedData);
