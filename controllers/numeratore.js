@@ -34,7 +34,7 @@ const getNumber = async (req, res) => {
     const loadedSharedData = utils.loadSharedData();
 
     if (loadedSharedData) {
-      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
       console.log("Impossibile caricare i dati dalle shared data.");
       throw new Error("Impossibile caricare i dati dalle shared data.");
@@ -106,7 +106,7 @@ const saveNumber = async (req, res) => {
     const loadedSharedData = utils.loadSharedData();
 
     if (loadedSharedData) {
-      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/menu`;
+      percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
       console.log("Impossibile caricare i dati dalle shared data.");
       throw new Error("Impossibile caricare i dati dalle shared data.");
