@@ -84,8 +84,18 @@ const saveMenu = async (req, res) => {
         sagraAttuale: jsonString.sagra,
       };
 
+      // Utilizzo del metodo per salvare un valore
+      utils
+        .savePercorsoSagraSQLite(jsonString.sagra)
+        .then(() => {
+          console.error("Dati salvati con successo");
+        })
+        .catch((error) => {
+          console.error("Errore:", error);
+        });
+
       // Salvataggio dei dati nelle shared
-      utils.saveSharedData(sharedData);
+      //  utils.saveSharedData(sharedData);
 
       const percorso = `prolocoNazzano/${jsonString.sagra}/menu`;
 

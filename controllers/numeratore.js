@@ -64,13 +64,25 @@ const saveNumber = async (req, res) => {
   const jsonString = req.body;
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = await utils.loadSharedData();
+    /* const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
       console.log("Impossibile caricare i dati.");
       throw new Error("Impossibile caricare i dati.");
-    }
+    } */
+    // Utilizzo del metodo per ottenere il percorso della sagra
+    utils
+      .getPercorsoSagraSQLite()
+      .then((percorsoSagra) => {
+        console.error("Percorso Sagra:", percorsoSagra);
+        percorsoDb = `prolocoNazzano/${percorsoSagra}/numeratore`;
+      })
+      .catch((error) => {
+        console.error("Errore:", error);
+        throw new Error("Impossibile caricare i dati dal db locale");
+      });
+
     // Controllo che il json sia valido
     if (isValidJSON(jsonString)) {
       const { numero, tempoMedioServizio } = jsonString;

@@ -7,6 +7,9 @@ const { getDatabase, ref, get } = require("firebase/database");
 
 require("dotenv").config();
 
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database("mydb.sqlite");
+
 // Configura Firebase con le credenziali del tuo progetto
 const firebaseConfig = {
   apiKey: process.env.APIKEY_FIREBASE,
@@ -90,7 +93,51 @@ const getPercorsoSagra = async (req, res) => {
   }
 };
 
+const savePercorsoSagraSQLite = (name, value) => {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run("CREATE TABLE IF NOT EXISTS settings (name TEXT)");
+      const stmt = db.prepare(
+        "INSERT OR REPLACE INTO settings (name) VALUES (?)"
+      );
+      stmt.run(name, (err) => {
+        stmt.finalize();
+        if (err) {
+          console.error("Errore nel salvataggio dei dati:", err);
+          reject(err);
+        } else {
+          console.log("Dati salvati con successo");
+          resolve();
+        }
+      });
+    });
+  });
+};
+
+const getPercorsoSagraSQLite = () => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT value FROM settings WHERE name = 'sagraAttuale'",
+      (err, row) => {
+        if (err) {
+          console.error("Errore nel caricamento dei dati:", err);
+          reject(err);
+        } else {
+          if (row) {
+            resolve(row.value);
+          } else {
+            console.error("Nessun valore trovato per 'sagraAttuale'");
+            reject(new Error("Nessun valore trovato per 'sagraAttuale'"));
+          }
+        }
+      }
+    );
+  });
+};
+
 module.exports = {
   saveSharedData,
   loadSharedData,
+  savePercorsoSagraSQLite,
+  getPercorsoSagraSQLite,
 };
