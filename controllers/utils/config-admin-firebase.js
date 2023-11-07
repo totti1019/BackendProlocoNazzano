@@ -8,7 +8,7 @@ const firebase = require("firebase/app");
 
 // Inizializzazione di Firebase Admin
 const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-
+console.error("FABIO oooo", credentialsPath);
 if (!credentialsPath) {
   console.error(
     "La variabile d'ambiente FIREBASE_CREDENTIALS_PATH non è configurata."
