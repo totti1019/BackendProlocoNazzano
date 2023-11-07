@@ -93,12 +93,12 @@ const getPercorsoSagra = async (req, res) => {
   }
 };
 
-const savePercorsoSagraSQLite = (name, value) => {
+const savePercorsoSagraSQLite = (name) => {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
-      db.run("CREATE TABLE IF NOT EXISTS settings (name TEXT)");
+      db.run("CREATE TABLE IF NOT EXISTS percorso (name TEXT)");
       const stmt = db.prepare(
-        "INSERT OR REPLACE INTO settings (name) VALUES (?)"
+        "INSERT OR REPLACE INTO percorso (name) VALUES (?)"
       );
       stmt.run(name, (err) => {
         stmt.finalize();
@@ -116,22 +116,19 @@ const savePercorsoSagraSQLite = (name, value) => {
 
 const getPercorsoSagraSQLite = () => {
   return new Promise((resolve, reject) => {
-    db.get(
-      "SELECT value FROM settings WHERE name = 'sagraAttuale'",
-      (err, row) => {
-        if (err) {
-          console.error("Errore nel caricamento dei dati:", err);
-          reject(err);
+    db.get("SELECT name FROM percorso", (err, row) => {
+      if (err) {
+        console.error("Errore nel caricamento dei dati:", err);
+        reject(err);
+      } else {
+        if (row) {
+          resolve(row.name);
         } else {
-          if (row) {
-            resolve(row.value);
-          } else {
-            console.error("Nessun valore trovato per 'sagraAttuale'");
-            reject(new Error("Nessun valore trovato per 'sagraAttuale'"));
-          }
+          console.error("Nessun valore trovato per 'sagraAttuale'");
+          reject(new Error("Nessun valore trovato per 'sagraAttuale'"));
         }
       }
-    );
+    });
   });
 };
 

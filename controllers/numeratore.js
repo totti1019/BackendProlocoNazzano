@@ -72,7 +72,7 @@ const saveNumber = async (req, res) => {
       throw new Error("Impossibile caricare i dati.");
     } */
     // Utilizzo del metodo per ottenere il percorso della sagra
-    utils
+    await utils
       .getPercorsoSagraSQLite()
       .then((percorsoSagra) => {
         console.error("Percorso Sagra:", percorsoSagra);
