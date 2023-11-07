@@ -15,7 +15,7 @@ const configureWebSocket = require("./middlewares/websocket");
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 // Configura l'app Express
 const app = express();

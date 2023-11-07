@@ -12,13 +12,24 @@ const database = getDatabase(appFirebase);
 const getNumber = async (req, res) => {
   try {
     // Caricamento dei dati dalle shared
-    const loadedSharedData = await utils.loadSharedData();
+    /* const loadedSharedData = await utils.loadSharedData();
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
       console.log("Impossibile caricare i dati.");
       throw new Error("Impossibile caricare i dati.");
-    }
+    } */
+
+    await utils
+      .getPercorsoSagraSQLite()
+      .then((percorsoSagra) => {
+        console.error("Percorso Sagra:", percorsoSagra);
+        percorsoDb = `prolocoNazzano/${percorsoSagra}/numeratore`;
+      })
+      .catch((error) => {
+        console.error("Errore:", error);
+        throw new Error("Impossibile caricare i dati dal db locale");
+      });
 
     const dataRef = ref(database, percorsoDb);
 

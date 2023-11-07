@@ -8,7 +8,6 @@ const firebase = require("firebase/app");
 
 // Inizializzazione di Firebase Admin
 const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-let serviceAccount;
 
 if (!credentialsPath) {
   console.error(
@@ -17,22 +16,8 @@ if (!credentialsPath) {
   process.exit(1);
 }
 
-try {
-  serviceAccount = JSON.parse(credentialsPath);
-  if (serviceAccount && typeof serviceAccount === "object") {
-    // La variabile è un oggetto JSON valido
-    console.error("La variabile è un JSON valido.");
-    console.log("La variabile è un JSON valido.");
-  } else {
-    console.log("La variabile non è un JSON valido.");
-    serviceAccount = require(path.join(__dirname, "../..", credentialsPath));
-  }
-} catch (error) {
-  console.error("La variabile non è un JSON valido.");
-  serviceAccount = require(path.join(__dirname, "../..", credentialsPath));
-}
+const serviceAccount = require(path.join(__dirname, "../..", credentialsPath));
 
-console.log(credentialsPath);
 try {
   adminFirebase.initializeApp({
     credential: adminFirebase.credential.cert(serviceAccount),
