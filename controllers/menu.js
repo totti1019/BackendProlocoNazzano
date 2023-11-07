@@ -101,14 +101,8 @@ const saveMenu = async (req, res) => {
 
       const dataRef = ref(database, percorso);
 
-      // Utilizza il metodo 'set' per sovrascrivere i dati del menu nel percorso specificato
-
-      const percorsoSagra = `prolocoNazzano`;
-      const dataRefSagra = ref(database, percorsoSagra);
-
       // Utilizza il metodo 'set' per sovrascrivere i dati della sagra e update per salvare il percorso della sagra attuale
       await set(dataRef, jsonString).then(() => {
-        update(dataRefSagra, { sagraAttuale: jsonString.sagra });
         res.status(200).json({
           code: res.statusCode,
           esito: true,
