@@ -3,7 +3,6 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
-const usersRouters = require("./routers/users");
 const authRoutes = require("./routers/auth");
 const { authenticateToken } = require("./middlewares/auth");
 const menuRouters = require("./routers/menu");
@@ -57,7 +56,6 @@ app.use(function (req, res, next) {
 });
 
 // Collegamento delle rotte alle relative parti dell'app
-app.use("/users", authenticateToken, usersRouters);
 app.use("/auth", authRoutes);
 app.use("/menu", requireAuthFirebase, menuRouters);
 app.use("/numeratore", requireAuthFirebase, numeratoreRouters);
