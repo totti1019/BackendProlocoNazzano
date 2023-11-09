@@ -32,7 +32,7 @@ const getNumber = async (req, res) => {
       }); */
 
     const loadedSharedData = utils.loadSharedData();
-
+    console.log("loadedSharedData ", loadedSharedData);
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {
@@ -70,7 +70,6 @@ const getNumber = async (req, res) => {
       });
   } catch (error) {
     console.error("Errore nella lettura dei dati: ", error);
-
     res.status(500).json({
       code: res.statusCode,
       esito: false,

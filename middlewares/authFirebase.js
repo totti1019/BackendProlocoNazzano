@@ -7,7 +7,6 @@ const {
 // Questo controlla se i ltoken è ancora valido o no se è valido procede con la chiamata successiva
 const requireAuthFirebase = async (req, res, next) => {
   try {
-    console.log("CONTROLLO req.headers ", req.headers);
     if (req.method !== "POST") {
       return next();
     }
@@ -33,7 +32,6 @@ const requireAuthFirebase = async (req, res, next) => {
     }
 
     try {
-      console.log("CONTROLLO TOKEN ", token);
       const decodedToken = await admin.auth().verifyIdToken(token);
       req.user = decodedToken;
 
