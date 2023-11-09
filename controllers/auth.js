@@ -10,18 +10,10 @@ const {
   signInWithEmailAndPassword,
 } = require("firebase/auth");
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
-const { OAuth2Client } = require("google-auth-library");
-
-const client = new OAuth2Client();
-
-require("dotenv").config();
-
 const {
-  adminFirebase,
   appFirebase,
+  admin,
+  auth,
 } = require("../controllers/utils/config-admin-firebase"); // Importa il modulo di configurazione firebase admin
 
 // Autenticazione anonima
@@ -89,8 +81,60 @@ const loginAnonymous = async (req, res) => {
   }
 };
 
-// METODO PER IL LOGIN CON EMAIL E PASSWORD
 const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    // const auth = getAuth();
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((data) => {
+        data.user
+          .getIdToken()
+          .then((token) => {
+            return res.status(201).json({ token });
+          })
+          .catch((err) => {
+            console.error(err);
+            return res.status(500).json({ error: err.code });
+          });
+      })
+      /* .then(function () {
+        admin
+          .auth()
+          .currentUser.getIdToken(true)
+          .then(function (idToken) {
+            res.send(idToken);
+            res.end();
+          })
+          .catch(function (error) {
+            console.error(error);
+            return res.status(500).json({
+              code: res.statusCode,
+              esito: false,
+              message: "Credenziali errate",
+            });
+          });
+      }) */
+      .catch(function (error) {
+        console.error(error);
+        return res.status(500).json({
+          code: res.statusCode,
+          esito: false,
+          message: "Credenziali errate",
+        });
+      });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: res.statusCode,
+      esito: false,
+      message: "Credenziali errate",
+    });
+  }
+};
+
+// METODO PER IL LOGIN CON EMAIL E PASSWORD
+const login2 = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -103,21 +147,33 @@ const login = async (req, res) => {
     );
     const user = userCredential.user;
 
-    /* const oneDayFromNow = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // Scadenza tra 24 ore
+    const oneDayFromNow = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // Scadenza tra 24 ore
     const additionalClaims = {
       expires: oneDayFromNow, // Aggiungi il claim "expires" con l'orario di scadenza
+      //premiumAccount: true,
     };
 
-     const customToken = await adminFirebase
+    /*
+    
+    {
+  "rules": {
+    "premiumContent": {
+      ".read": "auth.token.premiumAccount === true"
+    }
+  }
+}
+    */
+
+    const customToken = await adminFirebase
       .auth()
-      .createCustomToken(user.uid, additionalClaims); */
+      .createCustomToken(user.uid, additionalClaims);
 
     // Ottenere il token ID
-    const idToken = await user.getIdToken();
+    //const idToken = await user.getIdToken(true);
 
     const oggetto = {
       uid: user.uid,
-      token: idToken,
+      token: customToken,
     };
 
     return res.status(200).json({

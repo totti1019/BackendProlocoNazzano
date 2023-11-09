@@ -82,6 +82,8 @@ const getNumber = async (req, res) => {
 // Funzione per scrivere dati nel database Firebase
 const saveNumber = async (req, res) => {
   const jsonString = req.body;
+  const token = req.token;
+  console.log("NUOVO TOKEN ", token);
   try {
     // Caricamento dei dati dalle shared
     /* const loadedSharedData = await utils.loadSharedData();

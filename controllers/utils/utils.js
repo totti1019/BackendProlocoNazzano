@@ -22,7 +22,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+//const database = getDatabase(app);
 
 // Percorso assoluto del file
 const filePath = path.join(__dirname, "sharedData.json");
