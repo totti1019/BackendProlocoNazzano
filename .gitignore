@@ -1,5 +1,4 @@
 
 .env
-controllers/utils/sharedData.json
 etc/secrets/proloconazzano-742a6-firebase-adminsdk-zsgqx-74a1e5b662.json
 etc/secrets/proloconazzano-firebase.json
