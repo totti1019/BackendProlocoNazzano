@@ -32,7 +32,6 @@ const getNumber = async (req, res) => {
       }); */
 
     const loadedSharedData = utils.loadSharedData();
-    console.log("loadedSharedData ", loadedSharedData);
     if (loadedSharedData) {
       percorsoDb = `prolocoNazzano/${loadedSharedData.sagraAttuale}/numeratore`;
     } else {

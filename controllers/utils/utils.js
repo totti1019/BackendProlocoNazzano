@@ -7,9 +7,6 @@ const { getDatabase, ref, get } = require("firebase/database");
 
 require("dotenv").config();
 
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("prolocoNazzano.sqlite");
-
 // Configura Firebase con le credenziali del tuo progetto
 const firebaseConfig = {
   apiKey: process.env.APIKEY_FIREBASE,
