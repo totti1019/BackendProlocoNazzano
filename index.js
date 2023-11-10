@@ -33,8 +33,7 @@ const io = new Server(httpServer, {
 
 // Middleware per il CORS
 app.use(function (req, res, next) {
-  //res.header("Access-Control-Allow-Origin", "https://fabiocola.altervista.org");
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "https://fabiocola.altervista.org");
 
   if (req.headers["access-control-request-method"]) {
     res.header(

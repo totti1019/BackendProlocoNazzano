@@ -78,7 +78,6 @@ const serviceAccount = require(path.join(__dirname, "../..", credentialsPath));
 const appFirebase = firebase.initializeApp(firebaseConfig);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  //databaseURL: process.env.DATABASEURL_FIREBASE,
 });
 
 const auth = getAuth();
