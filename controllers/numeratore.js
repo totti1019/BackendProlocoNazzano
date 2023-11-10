@@ -1,12 +1,12 @@
 const { getDatabase, ref, get, set, remove } = require("firebase/database");
 
-require("dotenv").config();
-
 const utils = require("./utils/utils");
 
 const { appFirebase } = require("../controllers/utils/config-admin-firebase"); // Importa il modulo di configurazione firebase admin
 
 const database = getDatabase(appFirebase);
+
+let percorsoDb = ``;
 
 // Funzione per leggere dati nel database Firebase
 const getNumber = async (req, res) => {
@@ -19,17 +19,6 @@ const getNumber = async (req, res) => {
       console.log("Impossibile caricare i dati.");
       throw new Error("Impossibile caricare i dati.");
     } */
-
-    /* await utils
-      .getPercorsoSagraSQLite()
-      .then((percorsoSagra) => {
-        console.error("Percorso Sagra:", percorsoSagra);
-        percorsoDb = `prolocoNazzano/${percorsoSagra}/numeratore`;
-      })
-      .catch((error) => {
-        console.error("Errore:", error);
-        throw new Error("Impossibile caricare i dati dal db locale");
-      }); */
 
     const loadedSharedData = utils.loadSharedData();
     if (loadedSharedData) {

@@ -5,8 +5,6 @@ const { initializeApp } = require("firebase/app");
 
 const { getDatabase, ref, get } = require("firebase/database");
 
-require("dotenv").config();
-
 // Configura Firebase con le credenziali del tuo progetto
 const firebaseConfig = {
   apiKey: process.env.APIKEY_FIREBASE,

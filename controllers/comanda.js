@@ -7,8 +7,6 @@ const {
   runTransaction,
 } = require("firebase/database");
 
-require("dotenv").config();
-
 const utils = require("./utils/utils");
 
 const { appFirebase } = require("../controllers/utils/config-admin-firebase"); // Importa il modulo di configurazione firebase admin

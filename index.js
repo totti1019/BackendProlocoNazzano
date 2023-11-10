@@ -3,8 +3,8 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
+dotenv.config();
 const authRoutes = require("./routers/auth");
-const { authenticateToken } = require("./middlewares/auth");
 const menuRouters = require("./routers/menu");
 const numeratoreRouters = require("./routers/numeratore");
 const comandaRouters = require("./routers/comanda");
@@ -12,8 +12,6 @@ const utilsRouters = require("./routers/utils");
 const { requireAuthFirebase } = require("./middlewares/authFirebase");
 
 const configureWebSocket = require("./middlewares/websocket");
-
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
